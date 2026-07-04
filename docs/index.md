@@ -91,6 +91,9 @@ End-to-end reference implementations validating how the Guardrail Decision Engin
 ### I want to validate an implementation against reference behavior
 → [Case Studies](case-studies/index.md) → [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md)
 
+### I want to implement the system in code
+→ [`/reference`](../reference/README.md) → [`/reference/json`](../reference/json/) (schemas) → [`/reference/yaml`](../reference/yaml/) (configs) → [`/reference/react`](../reference/react/) (components)
+
 ### I want to contribute a new pattern
 → [Taxonomy](taxonomy/index.md) → [Patterns](patterns/index.md) → [`CONTRIBUTING.md`](../CONTRIBUTING.md)
 
@@ -108,3 +111,4 @@ End-to-end reference implementations validating how the Guardrail Decision Engin
 | Enterprise Playbooks | Phase 1 | Scaffold |
 | Regulated Industries | Phase 1 | Scaffold |
 | Case Studies | Phase 1, 5 | ✅ Complete — 8 case studies + comparison matrix (stable) |
+| Reference Implementations | Phase 6 | ✅ Complete — schemas, YAML configs, React examples, Next.js demo, JSON payloads (stable) |
