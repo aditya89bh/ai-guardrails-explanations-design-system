@@ -1,0 +1,35 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node (for any tooling)
+node_modules/
+dist/
+.cache/
+
+# Python (for any tooling)
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Build output
+build/
+out/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Generated docs (if applicable)
+site/
