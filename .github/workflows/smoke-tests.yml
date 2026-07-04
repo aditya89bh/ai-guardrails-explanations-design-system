@@ -1,0 +1,58 @@
+name: Smoke Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    name: Run Full Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: tests/package-lock.json
+
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm ci --prefer-offline
+
+      - name: Run decision engine tests
+        working-directory: tests
+        run: node --test engine/engine.test.js
+
+      - name: Run schema validation tests
+        working-directory: tests
+        run: node --test schemas/schema.test.js
+
+      - name: Run payload validation tests
+        working-directory: tests
+        run: node --test payloads/payload.test.js
+
+      - name: Run YAML configuration tests
+        working-directory: tests
+        run: node --test yaml/yaml.test.js
+
+      - name: Run smoke tests
+        working-directory: tests
+        run: node --test smoke/smoke.test.js
+
+      - name: Report summary
+        run: |
+          echo "All test suites completed."
+          echo ""
+          echo "Suites:"
+          echo "  engine/engine.test.js   — decision engine validation"
+          echo "  schemas/schema.test.js  — JSON schema structure"
+          echo "  payloads/payload.test.js — example payload validation"
+          echo "  yaml/yaml.test.js       — YAML configuration validation"
+          echo "  smoke/smoke.test.js     — repository structure and accessibility"

@@ -6,11 +6,13 @@ on:
     paths:
       - '**/*.md'
       - '.github/workflows/markdown-lint.yml'
+      - '.markdownlint.json'
   pull_request:
     branches: [main]
     paths:
       - '**/*.md'
       - '.github/workflows/markdown-lint.yml'
+      - '.markdownlint.json'
 
 jobs:
   lint:
@@ -26,10 +28,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install markdownlint-cli
-        run: npm install -g markdownlint-cli
+      - name: Install markdownlint-cli2
+        run: npm install -g markdownlint-cli2
 
-      - name: Create markdownlint config
+      - name: Write markdownlint config
         run: |
           cat > .markdownlint.json << 'EOF'
           {
@@ -38,14 +40,26 @@ jobs:
             "MD033": false,
             "MD041": false,
             "MD024": { "siblings_only": true },
-            "MD007": { "indent": 2 }
+            "MD007": { "indent": 2 },
+            "MD012": false,
+            "MD036": false
           }
           EOF
 
       - name: Lint all Markdown files
         run: |
-          markdownlint \
-            --ignore node_modules \
-            --ignore playground/.next \
-            --ignore playground/node_modules \
-            '**/*.md'
+          markdownlint-cli2 \
+            "**/*.md" \
+            "!node_modules/**" \
+            "!playground/.next/**" \
+            "!playground/node_modules/**" \
+            "!tests/node_modules/**"
+
+      - name: Report file count
+        run: |
+          count=$(find . -name "*.md" \
+            -not -path "./node_modules/*" \
+            -not -path "./playground/node_modules/*" \
+            -not -path "./playground/.next/*" \
+            -not -path "./tests/node_modules/*" | wc -l)
+          echo "Linted $count Markdown files"

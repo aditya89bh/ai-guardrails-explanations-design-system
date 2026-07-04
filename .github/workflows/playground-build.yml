@@ -41,14 +41,15 @@ jobs:
         run: |
           echo "Checking for build output..."
           if [ ! -d ".next" ]; then
-            echo "ERROR: .next directory not found"
+            echo "ERROR: .next directory not found after build"
             exit 1
           fi
-          echo "Build output verified."
+          echo "✓ Build output verified"
 
-      - name: Check engine files are present
+      - name: Verify engine module files
         run: |
           echo "Checking engine module files..."
+          MISSING=0
           for f in \
             playground/engine/primitives.js \
             playground/engine/rules.js \
@@ -56,13 +57,19 @@ jobs:
             playground/engine/schema-bridge.js \
             playground/engine/config-bridge.js; do
             if [ ! -f "$f" ]; then
-              echo "ERROR: Missing engine file: $f"
-              exit 1
+              echo "MISSING: $f"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✓ $f"
             fi
           done
-          echo "All engine files present."
+          if [ $MISSING -gt 0 ]; then
+            echo "ERROR: $MISSING engine file(s) missing"
+            exit 1
+          fi
+          echo "✓ All engine files present"
 
-      - name: Check data files are present
+      - name: Verify data files
         run: |
           echo "Checking data files..."
           for f in \
@@ -72,5 +79,43 @@ jobs:
               echo "ERROR: Missing data file: $f"
               exit 1
             fi
+            echo "✓ $f"
           done
-          echo "All data files present."
+          echo "✓ All data files present"
+
+      - name: Verify component files
+        run: |
+          echo "Checking playground component files..."
+          MISSING=0
+          for f in \
+            playground/components/ErrorBoundary.jsx \
+            playground/components/PrimitiveControls.jsx \
+            playground/components/EnginePanel.jsx \
+            playground/components/ResultPanel.jsx \
+            playground/components/AuditPanel.jsx \
+            playground/components/guardrail/WarningBanner.jsx \
+            playground/components/guardrail/PermissionGate.jsx \
+            playground/components/guardrail/ConfidenceBadge.jsx \
+            playground/components/guardrail/RefusalCard.jsx \
+            playground/components/guardrail/RecoveryPrompt.jsx \
+            playground/components/guardrail/EscalationCard.jsx; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✓ $f"
+            fi
+          done
+          if [ $MISSING -gt 0 ]; then
+            echo "ERROR: $MISSING component file(s) missing"
+            exit 1
+          fi
+          echo "✓ All component files present"
+
+      - name: Run smoke tests
+        run: |
+          cd tests
+          npm ci --prefer-offline
+          node --test smoke/smoke.test.js
+        env:
+          NODE_OPTIONS: '--experimental-vm-modules'

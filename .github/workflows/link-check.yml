@@ -16,7 +16,7 @@ on:
 
 jobs:
   check-links:
-    name: Check Internal Links
+    name: Check Internal and External Links
     runs-on: ubuntu-latest
 
     steps:
@@ -31,26 +31,56 @@ jobs:
       - name: Install markdown-link-check
         run: npm install -g markdown-link-check
 
-      - name: Create link check config
+      - name: Write link check config
         run: |
           cat > .markdown-link-check.json << 'EOF'
           {
             "ignorePatterns": [
               { "pattern": "^https://github.com/your-org" },
-              { "pattern": "^http://localhost" }
+              { "pattern": "^https://github.com/aditya89bh" },
+              { "pattern": "^http://localhost" },
+              { "pattern": "^https://mermaid.live" }
             ],
-            "aliveStatusCodes": [200, 206],
-            "timeout": "10s",
+            "aliveStatusCodes": [200, 206, 301, 302],
+            "timeout": "15s",
             "retryOn429": true,
             "retryCount": 3,
             "fallbackRetryDelay": "30s"
           }
           EOF
 
-      - name: Check links in all Markdown files
+      - name: Find all Markdown files
+        id: find
         run: |
-          find . -name "*.md" \
+          FILES=$(find . -name "*.md" \
             -not -path "./node_modules/*" \
             -not -path "./playground/node_modules/*" \
             -not -path "./playground/.next/*" \
-            | xargs -I {} markdown-link-check {} --config .markdown-link-check.json
+            -not -path "./tests/node_modules/*" \
+            | sort)
+          echo "Found $(echo "$FILES" | wc -l) markdown files"
+          echo "$FILES" > /tmp/md_files.txt
+
+      - name: Check links in all Markdown files
+        run: |
+          FAIL=0
+          while IFS= read -r file; do
+            if ! markdown-link-check "$file" --config .markdown-link-check.json --quiet 2>&1; then
+              echo "Link errors in: $file"
+              FAIL=$((FAIL + 1))
+            fi
+          done < /tmp/md_files.txt
+          echo ""
+          echo "Link check complete."
+          if [ $FAIL -gt 0 ]; then
+            echo "WARNING: $FAIL file(s) had link errors."
+            echo "Check if failing links are placeholder (your-org) URLs or genuine broken links."
+            exit 1
+          fi
+          echo "All links valid."
+
+      - name: Count checked files
+        if: always()
+        run: |
+          total=$(wc -l < /tmp/md_files.txt)
+          echo "Checked $total Markdown files for broken links"

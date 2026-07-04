@@ -6,17 +6,19 @@ on:
     paths:
       - 'reference/json/**'
       - 'reference/examples/**'
+      - 'reference/yaml/**'
       - '.github/workflows/schema-validation.yml'
   pull_request:
     branches: [main]
     paths:
       - 'reference/json/**'
       - 'reference/examples/**'
+      - 'reference/yaml/**'
       - '.github/workflows/schema-validation.yml'
 
 jobs:
   validate:
-    name: Validate JSON Schemas and Example Payloads
+    name: Validate Schemas, Payloads, and YAML Configs
     runs-on: ubuntu-latest
 
     steps:
@@ -28,57 +30,75 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install ajv-cli
-        run: npm install -g ajv-cli ajv-formats
-
-      - name: Check schema files are valid JSON
+      - name: Check JSON schema files
         run: |
-          echo "Checking JSON schema files for valid JSON syntax..."
+          echo "=== JSON Schema Validation ==="
+          PASS=0
+          FAIL=0
           for f in reference/json/*.schema.json; do
-            if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
-              echo "ERROR: Invalid JSON in $f"
-              exit 1
+            if python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "✓ $f"
+              PASS=$((PASS + 1))
+            else
+              echo "✗ ERROR: $f — invalid JSON"
+              FAIL=$((FAIL + 1))
             fi
-            echo "✓ $f"
           done
-          echo "All schema files are valid JSON."
+          echo ""
+          echo "Schemas: $PASS passed, $FAIL failed"
+          [ $FAIL -eq 0 ] || exit 1
 
-      - name: Check example payload files are valid JSON
+      - name: Check example payload files
         run: |
-          echo "Checking example payload files for valid JSON syntax..."
+          echo "=== Example Payload Validation ==="
+          PASS=0
+          FAIL=0
           for f in reference/examples/*.json; do
-            if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
-              echo "ERROR: Invalid JSON in $f"
-              exit 1
+            if python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "✓ $f"
+              PASS=$((PASS + 1))
+            else
+              echo "✗ ERROR: $f — invalid JSON"
+              FAIL=$((FAIL + 1))
             fi
-            echo "✓ $f"
           done
-          echo "All example payload files are valid JSON."
+          echo ""
+          echo "Payloads: $PASS passed, $FAIL failed"
+          [ $FAIL -eq 0 ] || exit 1
 
-      - name: Validate example payloads against schemas
+      - name: Check YAML config files
         run: |
-          echo "Validating example payloads against decision engine schema..."
-          # Validate each payload against the decision engine schema if possible
-          # Falls back to JSON syntax check when payloads don't match top-level schema type
-          for payload in reference/examples/*.json; do
-            echo "Checking $payload..."
-            python3 - <<PYEOF
-          import json, sys
-          with open("$payload") as f:
-              try:
-                  data = json.load(f)
-                  print(f"  ✓ $payload is valid JSON with {len(data) if isinstance(data, (list,dict)) else 1} top-level item(s)")
-              except json.JSONDecodeError as e:
-                  print(f"  ERROR: $payload — {e}")
-                  sys.exit(1)
-          PYEOF
+          echo "=== YAML Configuration Validation ==="
+          pip install pyyaml --quiet
+          PASS=0
+          FAIL=0
+          for f in reference/yaml/*.yaml; do
+            if python3 -c "import yaml; yaml.safe_load(open('$f'))" 2>/dev/null; then
+              echo "✓ $f"
+              PASS=$((PASS + 1))
+            else
+              echo "✗ ERROR: $f — invalid YAML"
+              FAIL=$((FAIL + 1))
+            fi
           done
-          echo "All example payloads validated."
+          echo ""
+          echo "YAML configs: $PASS passed, $FAIL failed"
+          [ $FAIL -eq 0 ] || exit 1
 
-      - name: Count schemas and report
+      - name: Run schema and payload test suite
+        run: |
+          echo "=== Running test suites ==="
+          cd tests
+          npm ci --prefer-offline
+          node --test schemas/schema.test.js payloads/payload.test.js yaml/yaml.test.js
+
+      - name: Summary
         run: |
           schema_count=$(ls reference/json/*.schema.json 2>/dev/null | wc -l)
           payload_count=$(ls reference/examples/*.json 2>/dev/null | wc -l)
-          echo "Schema validation summary:"
-          echo "  JSON schemas:    $schema_count"
+          yaml_count=$(ls reference/yaml/*.yaml 2>/dev/null | wc -l)
+          echo ""
+          echo "Validation complete:"
+          echo "  JSON schemas:     $schema_count"
           echo "  Example payloads: $payload_count"
+          echo "  YAML configs:     $yaml_count"
