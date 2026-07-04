@@ -72,22 +72,31 @@ Every pattern has an associated severity level that determines the friction it i
 
 ### Uncertainty State Variants
 
+Uncertainty states describe the AI's internal operating state with respect to the reliability of its output. Each state determines which explanation patterns activate, which actions are permitted, and how user interaction is structured.
+
 | Sub-type | Definition |
 |---|---|
-| **High confidence** | AI output meets the confidence threshold for the domain; disclosed passively |
-| **Moderate confidence** | AI output is usable but should be verified; disclosed with advisory label |
-| **Low confidence** | AI output is uncertain; user must not rely on it without verification |
-| **Unresolvable uncertainty** | AI cannot produce a reliable output; refusal or escalation required |
+| **High confidence** | AI output meets or exceeds the configured confidence threshold for the domain and output type. Disclosed passively (optional indicator). No friction applied. |
+| **Moderate confidence** | AI output is usable but falls below the high-confidence threshold. Disclosed with an advisory label and a verification recommendation. Moderate-friction interaction. |
+| **Low confidence** | AI output is below the low-confidence floor. May still produce directional output, but must actively discourage unsupported reliance. Requires explicit disclosure and restricts consequential actions. |
+| **Conflicting evidence** | Two or more retrieved sources make materially contradictory claims relevant to the query. The conflict cannot be resolved without user input or additional context. Both versions of the claim must be surfaced with attribution. |
+| **Insufficient information** | Required information is absent — not low quality, but absent. The AI cannot form a basis for output. Primary resolution path is clarification request or user-provided context. |
+| **Stale context** | Primary information source is older than the configured freshness threshold for the output type and deployment context. Time-sensitive elements require external verification. Stable elements may still be delivered. |
+| **Unresolvable** | Terminal state. The AI cannot produce any reliable or useful output. Even a heavily disclosed output would mislead the user. Resolution is refusal, escalation, or task reframing only. |
 
 ### Refusal State Variants
 
+Refusal states describe the AI's interaction strategy when it cannot fulfill a request as stated. Each variant defines a distinct approach: what is refused, what can still be provided, and what the user's path forward is.
+
 | Sub-type | Definition |
 |---|---|
-| **Policy refusal** | The request violates a defined policy. Cannot proceed. |
-| **Capability refusal** | The AI cannot fulfill this request due to capability limits. |
-| **Safety refusal** | The request poses a safety risk. Cannot proceed. |
-| **Scope refusal** | The request is outside the AI's authorized scope for this context. |
-| **Graceful degradation** | The AI cannot fully fulfill the request but provides partial output with disclosure |
+| **Safe refusal** | Complete, unconditional refusal of a request that creates a material safety, harm, or ethical risk. No completion path exists. |
+| **Partial completion** | AI fulfills the completable portions of a multi-part request and explicitly declines the portions it cannot — with clear labeling of what was excluded and why. |
+| **Constrained completion** | AI fulfills the request with modifications applied to bring it within policy, capability, or confidence bounds. The output is complete and coherent; the modifications are disclosed. |
+| **Alternative suggestion** | AI declines the specific request form but offers alternative approaches that serve the same underlying user goal. |
+| **Clarification request** | AI defers output generation and asks a targeted question because the request is underspecified or ambiguous in a way that materially affects the output. |
+| **Human handoff** | AI routes the user to an appropriate human agent because the task requires licensed expertise, organizational authority, or human judgment the AI cannot provide. |
+| **Policy refusal** | Complete refusal of a request because a configured organizational or regulatory policy prohibits this request type for this deployment, user role, or context. Rule-governed, not judgment-governed. |
 
 ### Escalation Path Variants
 
@@ -125,6 +134,10 @@ Trigger conditions describe the events or system states that activate a pattern.
 | **Safety signal** | Content or context triggers a defined safety classification |
 | **Data sensitivity signal** | Request involves data classified above the current trust level |
 | **Uncertainty ceiling** | Multiple plausible interpretations exist with no clear winner |
+| **Source conflict** | Two or more retrieved sources make materially contradictory claims about the same fact or assertion |
+| **Freshness threshold breach** | Primary information source is older than the configured acceptable freshness window for this output type |
+| **Information absence** | Required input or data is absent from the knowledge base and cannot be inferred; the AI has no basis for output |
+| **Unresolvable uncertainty** | No reliable or useful output can be produced; even disclosure cannot adequately mitigate the risk of misleading the user |
 | **Manual review flag** | A human or policy has flagged this interaction for review |
 
 ---
