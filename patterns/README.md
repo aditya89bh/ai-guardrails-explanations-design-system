@@ -60,11 +60,11 @@ patterns/
 │   ├── emergency-escalation.md      # Critical risk; interrupt mode; simultaneous multi-party routing
 │   └── async-review-escalation.md  # Non-immediate review queue; SLA-governed; user workflow continues
 └── recovery/                        # Recovery flow specifications
-    ├── retry-recovery.md
-    ├── redirect-recovery.md
-    ├── repair-recovery.md
-    ├── manual-override-recovery.md
-    └── abandon-recovery.md
+    ├── retry-recovery.md            # Re-attempt same action after transient block; auto/assisted/manual modes
+    ├── redirect-recovery.md         # Re-route to alternative path; goal preserved; context carried forward
+    ├── repair-recovery.md           # Correct error or invalid state before resuming; validate; rollback defined
+    ├── manual-override-recovery.md  # Authorized bypass of a guardrail; scoped, logged, time-bounded
+    └── abandon-recovery.md          # Clean, structured exit; draft preserved; re-entry path defined
 ```
 
 ---
@@ -209,5 +209,10 @@ Do not merge these specifications. Both serve distinct functions in the pattern 
   - `patterns/escalation/system-escalation.md` ✅
   - `patterns/escalation/emergency-escalation.md` ✅
   - `patterns/escalation/async-review-escalation.md` ✅
-- **Phase 2G:** Recovery flows — planned
-- **Phase 2 target:** Full specifications for all ~38 patterns across all seven categories
+- **Phase 2G:** Recovery flow category — 5 specifications stable ✅
+  - `retry-recovery.md` ✅
+  - `redirect-recovery.md` ✅
+  - `repair-recovery.md` ✅
+  - `manual-override-recovery.md` ✅
+  - `abandon-recovery.md` ✅
+- **Phase 2: COMPLETE** — 36 pattern specifications stable across all seven categories ✅
