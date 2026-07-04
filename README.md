@@ -3,9 +3,11 @@
 > A documentation-first design system for enterprise AI teams building trust and safety into AI products.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Phase](https://img.shields.io/badge/phase-8%20complete-brightgreen)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-v1.0.0-brightgreen)](RELEASE_NOTES.md)
+[![Tests](https://img.shields.io/badge/tests-165%20passing-brightgreen)](tests/)
 [![Patterns](https://img.shields.io/badge/patterns-36-informational)](patterns/)
-[![Playground](https://img.shields.io/badge/playground-live-purple)](playground/README.md)
+[![Playground](https://img.shields.io/badge/playground-local-purple)](playground/README.md)
+[![CI](https://img.shields.io/badge/CI-5%20workflows-informational)](.github/workflows/)
 
 ---
 
@@ -196,6 +198,14 @@ The design system has been specified, validated, and configured for:
 
 ---
 
+## Release Status
+
+**v1.0.0** — Initial stable release. See [RELEASE_NOTES.md](RELEASE_NOTES.md) for full notes and [VERSIONING.md](VERSIONING.md) for the versioning policy.
+
+See [ROADMAP.md](ROADMAP.md) for planned post-v1.0.0 enhancements.
+
+---
+
 ## Current Phase Status
 
 | Phase | Name | Status | Commits |
@@ -206,13 +216,23 @@ The design system has been specified, validated, and configured for:
 | **Phase 4** | AI Component Library | ✅ Complete — 47 component docs | ~21 |
 | **Phase 5** | Reference Implementations & Case Studies | ✅ Complete — 8 case studies | ~15 |
 | **Phase 6** | Developer SDK & Reference Implementation | ✅ Complete — schemas, configs, React, Next.js | ~25 |
-| **Phase 7** | Interactive Playground & Validation | ✅ Complete — 14-rule engine, 5 scenarios | ~23 |
-| **Phase 8** | Production Hardening & Open Source Release | ✅ Complete — CI, docs, community files | ~30 |
-| Phase 9 | Enterprise Playbooks | Planned | ~40 |
-| Phase 10 | Regulated Industries | Planned | ~40 |
-| Phase 11 | Extended Case Studies & Templates | Planned | ~30 |
-| Phase 12 | Review, Polish, and Release | Planned | ~20 |
-| **Total** | | | **~370 commits** |
+| **Phase 7** | Interactive Playground & Validation | ✅ Complete — engine, 5 scenarios, 14 components | ~23 |
+| **Phase 8** | Production Hardening & Open Source Release | ✅ Complete — CI, docs, community files, playground | ~30 |
+| **Phase 9** | Release Engineering, Validation & v1.0.0 | ✅ Complete — tests, CI improvements, v1.0.0 tag | ~25 |
+| v1.1+ | Enterprise Playbooks, Regulated Industries, Case Studies | Planned | — |
+| **Total** | | | **~216 commits** |
+
+---
+
+## Testing
+
+The repository includes a full automated test suite:
+
+```bash
+cd tests && npm install && npm test
+```
+
+165 tests across 5 suites: decision engine validation, JSON schema validation, payload validation, YAML configuration validation, and repository smoke tests (structure + accessibility markers). All tests run on every push via [GitHub Actions](.github/workflows/).
 
 ---
 
@@ -222,6 +242,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Before contributing, read:
 1. [docs/glossary.md](docs/glossary.md) — canonical terminology
 2. [docs/taxonomy/](docs/taxonomy/) — pattern categories and naming
 3. [docs/principles/](docs/principles/) — design philosophy
+
+Issues and discussions: [GitHub Issues](https://github.com/your-org/ai-guardrails-explanations-design-system/issues) · [GitHub Discussions](https://github.com/your-org/ai-guardrails-explanations-design-system/discussions)
 
 ---
 
