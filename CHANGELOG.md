@@ -12,6 +12,55 @@ Work in progress across active phases.
 
 ---
 
+## Phase 5 — Reference Implementations & Case Studies
+
+**Status:** Complete
+**Commits:** 15
+**Goal:** Validate the Guardrail Decision Engine, Pattern Library, and Component Library through complete end-to-end reference implementations in realistic enterprise AI product contexts. This phase introduced no new guardrail concepts — it exercised the existing 36 pattern specifications and 6-document decision engine.
+
+### Added
+
+**Case study framework:**
+- `docs/case-studies/README.md` — Canonical case study framework: purpose, scope boundaries (not new patterns, not wireframes), standard 11-section structure, case study index, coverage notes. All eight case studies listed with primary patterns and files.
+
+**Eight industry case studies (all stable):**
+- `docs/case-studies/healthcare-ai.md` — Drug interaction query in a clinical decision support system. Demonstrates: LC + stale-context state compounding, constrained-completion (not safe-refusal) for decision-support intent, claim-level source citation, role escalation offered (not forced). Key design decision: intent = decision-support allows partial output when intent = action-execution would not.
+- `docs/case-studies/banking-fraud.md` — Real-time fraud block for an international wire transfer. Demonstrates: policy-refusal (three simultaneous tenant-level rule matches), concurrent emergency escalation to fraud ops and policy warning to customer, redirect recovery (human-gated). Key design decision: customer-facing severity decoupled from internal escalation severity.
+- `docs/case-studies/insurance-claims.md` — Claims processing with two required documents absent. Demonstrates: insufficient-information-state (not LC), partial-completion, clarification-request with policy-anchored documentation list, async-review-escalation with defined SLA, repair recovery with document quality validation on re-entry. Key design decision: II state forces clarification-request, not constrained-completion.
+- `docs/case-studies/enterprise-hr.md` — PIP letter generation with scope boundary violation and stale data. Demonstrates: simultaneous scoped-permission (scope boundary) and stale-context signals, precedence engine resolving permission gate before stale disclosure, delegated-permission lifecycle with scope+expiry+purpose, constrained-completion with explicit placeholders. Key design decision: two guardrail conditions resolved in priority order, not simultaneously.
+- `docs/case-studies/customer-support.md` — Billing dispute across three turns with escalating sentiment. Demonstrates: progressive-warning escalation across session turns, modal-warning as session-level escalation confirmation, human-handoff (refusal) with full context transfer, retry-recovery as the optional alternative to handoff. Key design decision: "hasn't been able to locate" vs. "no record" preserves trust when data access may be incomplete.
+- `docs/case-studies/developer-copilot.md` — Security library selection with directly contradictory CVE evidence. Demonstrates: conflicting-evidence-state (not LC), safe-refusal (no recommendation), reasoning-trace explaining what would resolve the conflict, claim-level source citation for contradictory claims, alternative-suggestion, redirect-recovery. Key design decision: CE produces safe-refusal; LC produces constrained-completion — the distinction is the presence of irreconcilable sources, not the quantity of evidence.
+- `docs/case-studies/industrial-ai.md` — Chemical reactor sensor conflict sustained for 4+ minutes. Demonstrates: CE → UR state transition, system-initiated trigger (no user request), emergency escalation in interrupt mode (concurrent with operator panel), abandon-recovery mandatory in UR state at Risk=4, explicit operator reset required before AI resumes. Key design decision: false positive emergency response is the correct outcome for UR state in safety-critical contexts.
+- `docs/case-studies/autonomous-procurement.md` — AI agent purchase exceeds $25,000 spend ceiling due to spot pricing. Demonstrates: blocking-warning as authorization gate for autonomous agent, role-escalation with full context (business urgency, pricing anomaly), async-review-escalation triggered by SLA expiry, manual-override-recovery with transaction-scoped authorization, SOX audit flag. Key design decision: override authorization is per-transaction; the agent's authorization ceiling does not change after an approved exception.
+
+**Cross-industry analysis:**
+- `docs/case-studies/comparison-matrix.md` — Cross-industry comparison across 8 dimensions: primary trigger, confidence state, primary refusal pattern, escalation path, recovery flow, audit level, deployment notes. Full 36-pattern coverage matrix (33 of 36 patterns exercised). Escalation comparison table. Recovery comparison table. Audit level comparison. Accessibility notes per case study. Coverage gap documentation for the 3 unexpercised patterns.
+
+**Updated index:**
+- `docs/case-studies/index.md` — Replaced Phase 1 scaffold with Phase 5 stable index: case study table with industry, risk, primary patterns, and file. Phase status table. Canonical structure summary.
+
+### Changed
+
+- `docs/index.md` — Updated Case Studies section description with full list of case studies and primary patterns. Added "I want to validate an implementation" navigation path. Updated Documentation Status table: Case Studies = ✅ Complete.
+- `README.md` — Phase 5 marked complete in phase status table. Added case studies navigation path for enterprise architects and validating engineers. Updated roadmap section with Phase 5 description and Phase 6+ renumbering.
+- `CHANGELOG.md` — This entry.
+
+### Key design decisions
+
+1. **Each case study exercises different parts of the system.** No two case studies share the same primary confidence state, primary escalation path, or primary recovery flow. The case study set is designed to provide distinct reference points, not redundant examples.
+2. **System-initiated triggers are given explicit treatment.** Two case studies (Industrial AI, Procurement) use system-initiated triggers rather than user requests. The primitive evaluation and user journey sections are adapted to reflect the autonomous agent context.
+3. **Lessons learned focus on non-obvious interactions.** Each case study's lessons learned section identifies design decisions that are not derivable by reading the pattern specifications alone — compound primitive signals, unexpected precedence interactions, and deployment configuration requirements.
+4. **Pattern coverage gaps are documented honestly.** The comparison matrix names the 3 unexpercised patterns (decision-summary, structured-uncertainty-disclosure, one-time/session/persistent-permission, revocation, human-handoff escalation, system-escalation) and explains why they are not covered in this phase.
+
+### Known gaps
+
+- 8 of 36 pattern specifications are not exercised in Phase 5 case studies (see comparison matrix coverage gap documentation).
+- Case studies are implementation-agnostic — no code examples, no specific stack bindings.
+- Consumer product contexts (individual users, non-enterprise deployments) are not covered in Phase 5.
+- Cross-session and multi-system orchestration scenarios are deferred to Phase 8.
+
+---
+
 ## Phase 4 — AI Component Library
 
 **Status:** Complete
