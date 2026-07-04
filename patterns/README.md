@@ -36,18 +36,21 @@ patterns/
 │   ├── revocation.md                # Permission withdrawal and expiry
 │   └── audit-required-gate.md       # [Planned — compliance depth extension]
 ├── uncertainty/                     # Uncertainty state specifications
-│   ├── high-confidence-state.md
-│   ├── moderate-confidence-state.md
-│   ├── low-confidence-state.md
-│   ├── unresolvable-uncertainty-state.md
-│   └── conflicting-sources-state.md
+│   ├── high-confidence-state.md     # Default operating state; disclosed passively
+│   ├── moderate-confidence-state.md # Usable output with advisory disclosure
+│   ├── low-confidence-state.md      # Directional output only; active restriction
+│   ├── conflicting-evidence-state.md # Source contradiction; both versions surfaced
+│   ├── insufficient-information-state.md # Information absent; clarification required
+│   ├── stale-context-state.md       # Data beyond freshness threshold
+│   └── unresolvable-state.md        # Terminal state; refusal or escalation required
 ├── refusal/                         # Refusal state specifications
-│   ├── policy-refusal.md
-│   ├── capability-refusal.md
-│   ├── safety-refusal.md
-│   ├── scope-refusal.md
-│   ├── graceful-degradation.md
-│   └── contextual-refusal.md
+│   ├── safe-refusal.md              # Complete refusal on safety/harm grounds
+│   ├── partial-completion.md        # Complete the fulfillable portions; exclude the rest
+│   ├── constrained-completion.md    # Complete with disclosed modifications applied
+│   ├── alternative-suggestion.md    # Refuse the form; offer alternatives for the goal
+│   ├── clarification-request.md     # Defer pending targeted user input
+│   ├── human-handoff.md             # Route to human for expertise or authority
+│   └── policy-refusal.md            # Rule-governed refusal; specific policy cited
 ├── escalation/                      # Escalation path specifications
 │   ├── human-handoff.md
 │   ├── role-escalation.md
@@ -166,5 +169,21 @@ Links to case studies or examples that demonstrate this pattern in context.
   - `scoped-permission.md` ✅
   - `delegated-permission.md` ✅
   - `revocation.md` ✅
-- **Phase 2D–2G:** Uncertainty states, refusal states, escalation paths, and recovery flows — planned
+- **Phase 2D:** Uncertainty state category — 7 specifications stable ✅
+  - `high-confidence-state.md` ✅
+  - `moderate-confidence-state.md` ✅
+  - `low-confidence-state.md` ✅
+  - `conflicting-evidence-state.md` ✅
+  - `insufficient-information-state.md` ✅
+  - `stale-context-state.md` ✅
+  - `unresolvable-state.md` ✅
+- **Phase 2E:** Refusal state category — 7 specifications stable ✅
+  - `safe-refusal.md` ✅
+  - `partial-completion.md` ✅
+  - `constrained-completion.md` ✅
+  - `alternative-suggestion.md` ✅
+  - `clarification-request.md` ✅
+  - `human-handoff.md` ✅
+  - `policy-refusal.md` ✅
+- **Phase 2F–2G:** Escalation paths and recovery flows — planned
 - **Phase 2 target:** Full specifications for all ~38 patterns across all seven categories
