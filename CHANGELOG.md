@@ -12,6 +12,32 @@ Work in progress across active phases.
 
 ---
 
+## Phase 2G — Recovery Flow Specifications
+
+**Status:** Complete
+**Commits:** 11
+**Goal:** Complete Phase 2 by delivering all five recovery flow specifications — closing the interaction lifecycle for all seven guardrail pattern categories.
+
+### Added
+
+- `patterns/recovery/retry-recovery.md` — Re-attempts the same action after a transient blocking condition. Defines three distinct modes: automatic (AI-initiated, invisible to user), assisted (AI-initiated, user confirms), and manual (user-initiated). Mandates idempotency keys, exponential backoff, and retry limits. Defines zero-delay retry loops and retry of deterministic failures as named failure modes. Distinguishes retry (same path re-executed) from repair (path corrected before resuming).
+- `patterns/recovery/redirect-recovery.md` — Routes the user to an alternative path that achieves the same underlying goal after the original path is permanently closed. Defines goal preservation (identifying the underlying goal, not just the blocked request form) as the core obligation. Requires genuine alternatives — fabricated paths are a failure mode. Defines prohibited redirect (using redirect to circumvent a safe refusal) as a compliance failure.
+- `patterns/recovery/repair-recovery.md` — Corrects an error, data inconsistency, or invalid state within the current workflow and resumes from the corrected position. Defines three repair types: data repair, state repair, configuration repair. Requires pre-repair diagnosis, post-repair validation, and explicit rollback conditions before repair begins. Mandates data lineage preservation in regulated environments. Distinguishes repair (something changes before resuming) from retry (same action re-executed unchanged).
+- `patterns/recovery/manual-override-recovery.md` — Allows an authorized user to bypass a specific guardrail for a specific, scoped action, after role verification, risk acknowledgment, and immutable audit logging. Defines override scope (action, data, time, session), mandatory expiration, and automatic guardrail re-activation. Explicitly prohibits override of safe refusals. Defines routine override as a policy calibration signal, not a feature.
+- `patterns/recovery/abandon-recovery.md` — Provides a clean, structured exit from a workflow that will not be completed in the current session. Mandates draft preservation, re-entry path definition, and proper session state closure. Distinguishes abandonment (user decision) from failure (system failure) in the session record. Requires disclosure of what was saved vs. not saved before the session closes. Defines closing a session with unsaved user work without explicit acknowledgment as an absolute failure mode.
+
+### Changed
+
+- `docs/taxonomy/index.md` — Recovery flow variants expanded from 5 minimal rows to 5 complete sub-type definitions with descriptions that distinguish each flow's objective.
+- `docs/patterns/index.md` — Recovery flows table updated to 🟢 stable with severity columns and direct file links. Section description updated.
+- `patterns/README.md` — Recovery directory entry updated with inline descriptions. Phase 2G status block added. Phase 2 completion status declared (36 specifications stable).
+
+### Cleanup
+
+- Removed stale `.gitkeep` files from `patterns/recovery/` and `patterns/escalation/` — both directories now contain real pattern specifications.
+
+---
+
 ## Phase 2F — Escalation Path Specifications
 
 **Status:** Complete
