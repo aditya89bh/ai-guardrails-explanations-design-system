@@ -40,14 +40,16 @@ Warning patterns surface concerns, risks, or important considerations before a u
 
 Explanation patterns communicate the AI's reasoning, sources, confidence, or decision logic to the user.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Confidence Disclosure | Confidence disclosure | 🔲 | `patterns/explanation/confidence-disclosure.md` |
-| Source Citation | Source citation | 🔲 | `patterns/explanation/source-citation.md` |
-| Reasoning Trace | Reasoning trace | 🔲 | `patterns/explanation/reasoning-trace.md` |
-| Decision Summary | Decision summary | 🔲 | `patterns/explanation/decision-summary.md` |
-| Limitation Disclosure | Limitation disclosure | 🔲 | `patterns/explanation/limitation-disclosure.md` |
-| Structured Uncertainty Disclosure | Confidence + limitation | 🔲 | `patterns/explanation/structured-uncertainty-disclosure.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| Confidence Disclosure | Confidence disclosure | Informational–Advisory (0–1) | 🟢 | [`patterns/explanation/confidence-disclosure.md`](../../patterns/explanation/confidence-disclosure.md) |
+| Source Citation | Source citation | Informational (0) | 🟢 | [`patterns/explanation/source-citation.md`](../../patterns/explanation/source-citation.md) |
+| Reasoning Trace | Reasoning trace | Informational (0) | 🟢 | [`patterns/explanation/reasoning-trace.md`](../../patterns/explanation/reasoning-trace.md) |
+| Decision Summary | Decision summary | Informational (0) | 🟢 | [`patterns/explanation/decision-summary.md`](../../patterns/explanation/decision-summary.md) |
+| Limitation Disclosure | Limitation disclosure | Advisory (1) | 🟢 | [`patterns/explanation/limitation-disclosure.md`](../../patterns/explanation/limitation-disclosure.md) |
+| Structured Uncertainty Disclosure | Confidence + limitation | Advisory–Caution (1–2) | 🟢 | [`patterns/explanation/structured-uncertainty-disclosure.md`](../../patterns/explanation/structured-uncertainty-disclosure.md) |
+
+**Phase 2B complete.** All six explanation pattern specifications are stable.
 
 ---
 
@@ -55,14 +57,18 @@ Explanation patterns communicate the AI's reasoning, sources, confidence, or dec
 
 Permission gates require explicit user authorization before the AI proceeds with a consequential or irreversible action.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Soft Permission Gate | Soft gate | 🔲 | `patterns/permission/soft-gate.md` |
-| Hard Permission Gate | Hard gate | 🔲 | `patterns/permission/hard-gate.md` |
-| Audit-Required Permission Gate | Audit-required gate | 🔲 | `patterns/permission/audit-required-gate.md` |
-| Delegated Permission Gate | Delegated gate | 🔲 | `patterns/permission/delegated-gate.md` |
-| Bulk Action Permission Gate | Hard gate | 🔲 | `patterns/permission/bulk-action-gate.md` |
-| Third-Party Impact Gate | Hard gate + audit | 🔲 | `patterns/permission/third-party-impact-gate.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| One-Time Permission | Soft gate | Caution (2) | 🟢 | [`patterns/permission/one-time-permission.md`](../../patterns/permission/one-time-permission.md) |
+| Session Permission | Soft gate | Caution (2) | 🟢 | [`patterns/permission/session-permission.md`](../../patterns/permission/session-permission.md) |
+| Persistent Permission | Hard gate (initial) | Blocking (3) initial | 🟢 | [`patterns/permission/persistent-permission.md`](../../patterns/permission/persistent-permission.md) |
+| Scoped Permission | Hard gate | Blocking (3) | 🟢 | [`patterns/permission/scoped-permission.md`](../../patterns/permission/scoped-permission.md) |
+| Delegated Permission | Delegated gate | Blocking–Critical (3–4) | 🟢 | [`patterns/permission/delegated-permission.md`](../../patterns/permission/delegated-permission.md) |
+| Revocation | Revocation | Informational–Caution (0–2) | 🟢 | [`patterns/permission/revocation.md`](../../patterns/permission/revocation.md) |
+
+**Phase 2C complete.** All six permission gate specifications are stable. These replace the earlier abstract soft/hard/audit-required/delegated/bulk/third-party gate groupings with a concrete, lifecycle-based permission model (one-time → session → persistent → scoped → delegated → revocation).
+
+| Audit-Required Permission Gate | Audit-required gate | — | 🔲 | `patterns/permission/audit-required-gate.md` _(planned — additional compliance depth)_ |
 
 ---
 
