@@ -83,7 +83,10 @@ Start with [`docs/principles/`](docs/principles/) to understand the design philo
 Start with the decision engine in [`docs/decision-flows/`](docs/decision-flows/) to understand the selection, precedence, composition, and state-transition logic. Then read the pattern specs in [`patterns/`](patterns/) and the component specifications in [`components/`](components/). Use [`examples/`](examples/) for annotated implementations.
 
 ### Enterprise architects and compliance leads
-Begin with [`docs/enterprise-playbooks/`](docs/enterprise-playbooks/) and [`docs/regulated-industries/`](docs/regulated-industries/) for governance-ready guidance.
+Begin with [`docs/enterprise-playbooks/`](docs/enterprise-playbooks/) and [`docs/regulated-industries/`](docs/regulated-industries/) for governance-ready guidance. Use [`docs/case-studies/`](docs/case-studies/) to validate pattern behavior against your industry context.
+
+### Engineers validating an implementation
+Start with [`docs/case-studies/`](docs/case-studies/) to find the closest reference implementation for your deployment context. Cross-reference the pattern sequence and audit trail from the case study against your implementation.
 
 ### New contributors
 Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review the taxonomy in [`docs/taxonomy/`](docs/taxonomy/) before adding new patterns.
@@ -98,10 +101,10 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review t
 | **Phase 2** | Core Pattern Specifications | ✅ Complete — 36 pattern specs | ~90 commits |
 | **Phase 3** | Guardrail Decision Engine | ✅ Complete — 6-document decision engine | ~16 commits |
 | **Phase 4** | AI Component Library | ✅ Complete — 47 component documents across 7 categories | ~21 commits |
-| Phase 5 | Enterprise Playbooks | Planned | ~40 commits |
-| Phase 6 | Regulated Industries | Planned | ~40 commits |
-| Phase 7 | Case Studies and Examples | Planned | ~40 commits |
-| Phase 8 | Templates and Tooling | Planned | ~30 commits |
+| **Phase 5** | Reference Implementations & Case Studies | ✅ Complete — 8 case studies across 8 industries + comparison matrix | ~15 commits |
+| Phase 6 | Enterprise Playbooks | Planned | ~40 commits |
+| Phase 7 | Regulated Industries | Planned | ~40 commits |
+| Phase 8 | Extended Case Studies & Templates | Planned | ~30 commits |
 | Phase 9 | Review, Polish, and Release | Planned | ~20 commits |
 | **Total** | | | **~350 commits** |
 
@@ -124,16 +127,16 @@ A six-document decision engine that governs how all 36 pattern specifications ar
 ### Phase 4 — UI Component Specifications (~50 commits)
 Visual and behavioral specifications for UI components that implement each pattern. Covers anatomy, states, accessibility, motion, and responsive behavior.
 
-### Phase 5 — Enterprise Playbooks (~40 commits)
+### Phase 5 — Reference Implementations & Case Studies (~15 commits) — Complete
+Eight end-to-end case studies across healthcare, financial services, insurance, enterprise HR, customer support, developer tools, manufacturing, and procurement. Each case study demonstrates the full decision engine → pattern selection → component activation → user journey → audit trail → recovery flow pipeline. Includes a cross-industry comparison matrix covering risk, pattern coverage, escalation paths, recovery flows, audit levels, and accessibility.
+
+### Phase 6 — Enterprise Playbooks (~40 commits)
 Deployment guidance for enterprise AI teams. Covers: policy configuration, audit trail requirements, multi-tenant considerations, localization, and organizational rollout.
 
-### Phase 6 — Regulated Industries (~40 commits)
+### Phase 7 — Regulated Industries (~40 commits)
 Domain-specific pattern variants for healthcare, financial services, legal, government, and critical infrastructure. Covers compliance requirements that affect pattern behavior.
 
-### Phase 7 — Case Studies and Examples (~40 commits)
-Reference implementations across common enterprise AI product types. Covers chat assistants, autonomous agents, decision-support tools, and content generation systems.
-
-### Phase 8 — Templates and Tooling (~30 commits)
+### Phase 8 — Extended Case Studies & Templates (~30 commits)
 Reusable pattern templates, decision-flow templates, and tooling for teams adopting the design system.
 
 ### Phase 9 — Review, Polish, and Release (~20 commits)
