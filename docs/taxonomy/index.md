@@ -114,13 +114,15 @@ Escalation paths route a request, decision, incident, or exception to a higher a
 
 ### Recovery Flow Variants
 
+Recovery flows return the user to productive work after a warning, permission denial, uncertainty state, refusal, or escalation. Recovery is not error handling — it is the structured path from a blocked or interrupted state back to goal completion. Each recovery flow has a distinct objective.
+
 | Sub-type | Definition |
 |---|---|
-| **Retry** | User can re-attempt the same or modified action |
-| **Redirect** | User is offered an alternative path to their goal |
-| **Repair** | AI or user corrects an error and continues |
-| **Manual override** | User with appropriate authority bypasses the guardrail |
-| **Abandon** | User exits the flow cleanly, with state preserved where possible |
+| **Retry** | Re-attempts the same or substantially similar action after a transient blocking condition has resolved. Three modes: automatic (no user action), assisted (user notified and confirms), manual (user-initiated). Requires idempotency guarantee and retry limit. Does not change the action — only re-executes it. |
+| **Redirect** | Routes the user to an alternative path that achieves the same underlying goal after the original path is permanently closed. Goal and context are preserved; the approach changes. Requires genuine alternatives — fabricated paths are a failure mode. |
+| **Repair** | Corrects a specific error, data inconsistency, or invalid state within the current workflow, then resumes from the corrected position. Three repair types: data repair, state repair, configuration repair. Requires pre-repair diagnosis, post-repair validation, and defined rollback conditions. |
+| **Manual override** | Allows an authorized user to bypass a guardrail for a specific, scoped action after explicit risk acknowledgment. Authorization-verified, time-bounded, immutably logged, and not applicable to safe refusals. The guardrail re-activates automatically on scope exit. |
+| **Abandon** | Provides a clean, structured exit from a workflow that cannot or will not be completed in the current session. Draft content is preserved, re-entry path is defined, session state is closed properly. Distinct from failure — abandonment is a user decision, not a system failure. |
 
 ---
 
