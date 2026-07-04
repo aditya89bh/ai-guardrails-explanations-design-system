@@ -12,6 +12,51 @@ Work in progress across active phases.
 
 ---
 
+## Phase 2B — Explanation Pattern Specifications
+
+**Status:** Complete
+**Commits:** 7 (including taxonomy fix)
+**Goal:** Deliver complete, stable specifications for all six explanation pattern variants.
+
+### Added
+
+- `docs/taxonomy/index.md` — Taxonomy updated to formally add blocking warning and policy warning subtypes introduced in Phase 2A (cleanup commit)
+- `patterns/explanation/confidence-disclosure.md` — Three-depth confidence disclosure (surface / contextual / detailed). Covers trigger conditions, graduated label guidance, accessibility (ARIA `role="note"`, no color-only), enterprise audit considerations, failure modes including percentage overload, and annotated legal AI example.
+- `patterns/explanation/source-citation.md` — Four-depth source citation (summary / list / linked / claim-level). Critical failure mode: citation hallucination — the highest-severity failure mode, requiring verification that cited sources were actually retrieved. Covers claim-level attribution with inline footnote accessibility requirements, enterprise source version integrity, and HR policy example.
+- `patterns/explanation/reasoning-trace.md` — Three-depth reasoning trace (summary / step-by-step / annotated). Covers immutability requirement for compliance audit records, post-hoc rationalization as a critical failure mode, annotated step structure with sources and confidence per step, and loan assessment example.
+- `patterns/explanation/decision-summary.md` — Three-depth structured decision record (standard / extended / compliance). Covers user override capture, immutability and signature requirements, retention policy guidance, and vendor selection example with documented recommendation override.
+- `patterns/explanation/limitation-disclosure.md` — Three-depth limitation boundary disclosure (label / contextual / detailed). Covers distinction from confidence disclosure (structural vs. output-level), placement requirement (before or alongside affected content, not after), and regulatory compliance example.
+- `patterns/explanation/structured-uncertainty-disclosure.md` — Composite explanation pattern combining confidence + limitation for high-stakes outputs. Defines standard section structure (confidence, limitations, reliable elements, uncertain elements, recommended handling), compliance-depth immutability, and clinical pharmacology example.
+
+### Changed
+
+- `docs/taxonomy/index.md` — Blocking warning and policy warning formally added to warning pattern sub-types; explanation and permission sub-types significantly expanded with Phase 2B and 2C definitions
+
+---
+
+## Phase 2C — Permission Gate Specifications
+
+**Status:** Complete
+**Commits:** 7
+**Goal:** Deliver complete, stable specifications for the permission gate lifecycle: one-time, session, persistent, scoped, delegated, and revocation.
+
+### Added
+
+- `patterns/permission/one-time-permission.md` — Single-instance permission for bounded, consequential actions. Covers passive-dismissal-as-decline requirement, labeled action buttons, audit logging, permission fatigue failure mode, and project status update example.
+- `patterns/permission/session-permission.md` — Session-scoped authorization for repeated action types within a session. Covers session expiry enforcement, combined one-time + session offer pattern, scope definition requirements, revocation mid-session, and knowledge base posting example.
+- `patterns/permission/persistent-permission.md` — Standing cross-session authorization with deliberate grant UX. Covers mandatory permission management interface requirement, policy-driven expiry (no indefinite-without-review permissions), admin visibility requirements, no-premature-offer constraint, and analytics database example.
+- `patterns/permission/scoped-permission.md` — Resource-bounded authorization limiting AI access to minimum necessary scope. Covers least-privilege principle, scope enforcement requirement (not merely advisory), scope audit reports, ambiguous-scope failure mode, and vendor contract audit example.
+- `patterns/permission/delegated-permission.md` — Multi-party authorization routing. Covers approver identification requirements, SLA and timeout enforcement, conditional approval mechanism, approval chain audit requirements, approver identity verification for high-compliance contexts, and data access delegation example.
+- `patterns/permission/revocation.md` — Permission withdrawal covering user-initiated, admin-initiated, and system-initiated revocation. Covers immediate effect requirement, no-rollback-of-completed-actions rule, notification delivery audit, partial revocation failure mode, and mid-session CRM permission revocation example.
+
+### Changed
+
+- `docs/patterns/index.md` — Explanation pattern table updated to all 🟢 stable with severity column and direct file links; permission gate table replaced with lifecycle-based model (one-time → session → persistent → scoped → delegated → revocation) — all 🟢 stable
+- `patterns/README.md` — Explanation and permission category directory structures annotated; Phase Status updated to reflect 2B and 2C complete
+- `docs/taxonomy/index.md` — Permission gate sub-types expanded to full lifecycle model; explanation sub-types expanded with Phase 2B precision definitions
+
+---
+
 ## Phase 2A — Warning Pattern Specifications
 
 **Status:** Complete
