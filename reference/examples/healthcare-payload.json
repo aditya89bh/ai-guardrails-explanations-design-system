@@ -1,0 +1,99 @@
+{
+  "_comment": "Healthcare AI — Drug interaction query example payload. Matches docs/case-studies/healthcare-ai.md.",
+  "request": {
+    "sessionId": "session-hc-20260704-001",
+    "requestId": "req-hc-20260704-001",
+    "actor": {
+      "userId": "pharm-1042",
+      "role": "clinical_pharmacist",
+      "authorityTier": 2,
+      "businessUnit": "pharmacy-services"
+    },
+    "input": {
+      "queryText": "Rifampicin + lorlatinib interaction — any significant concerns for a patient on a stable rifampicin regimen who is starting lorlatinib for ALK+ NSCLC?",
+      "queryType": "drug-interaction",
+      "intent": "decision-support"
+    },
+    "context": {
+      "ehrPatientRef": "[redacted]",
+      "clinicalContext": "Pre-prescribing review"
+    }
+  },
+  "primitiveEvaluation": {
+    "P1_risk": 3,
+    "P1_reasoning": "Drug interaction in oncology patient — harm is significant and potentially irreversible (subtherapeutic anti-cancer dosing; adverse events)",
+    "P2_confidence": "low",
+    "P2_score": 0.52,
+    "P2_reasoning": "Lorlatinib is recently approved; interaction data is sparse in indexed sources; single Phase 1 PK study available",
+    "P3_capability": "partial",
+    "P3_reasoning": "AI can retrieve and synthesize available pharmacological data; cannot issue a definitive dosage recommendation",
+    "P4_permission": "authorized",
+    "P4_reasoning": "Clinical pharmacist role is authorized for drug interaction queries",
+    "P5_policy": "none",
+    "P5_reasoning": "Drug information queries are policy-permitted for clinical staff",
+    "P6_intent": "decision-support",
+    "P7_businessImpact": "high",
+    "P8_authority": 2,
+    "P9_contextFreshness": "stale",
+    "P9_staleReason": "Lorlatinib post-approval data post-dates knowledge base last index (7 months ago)",
+    "P10_sourceReliability": 2,
+    "P10_reasoning": "Rifampicin CYP3A4 data: well-established (high). Lorlatinib interaction data: single Phase 1 study (low)"
+  },
+  "engineExecution": {
+    "rulesActivated": [
+      { "ruleId": "hc-rule-01", "effect": "audit-only", "activatedPattern": "stale-context-state" },
+      { "ruleId": "hc-rule-02", "effect": "allow", "activatedPattern": "constrained-completion", "skippedPatterns": ["safe-refusal"] },
+      { "ruleId": "hc-rule-03", "effect": "audit-only", "activatedPattern": "source-citation" },
+      { "ruleId": "hc-rule-04", "effect": "audit-only", "activatedPattern": "limitation-disclosure" },
+      { "ruleId": "hc-rule-05", "effect": "require-escalation", "activatedPattern": "role-escalation" }
+    ],
+    "rulesSkipped": [
+      { "ruleId": "global-safe-refusal", "reason": "Intent = decision-support; AI is not executing an action; constrained completion is correct" },
+      { "ruleId": "global-emergency-escalation", "reason": "Risk = 3, not 4; no emergent patient safety event" }
+    ]
+  },
+  "activatedPatterns": [
+    "low-confidence-state",
+    "stale-context-state",
+    "constrained-completion",
+    "confidence-disclosure",
+    "limitation-disclosure",
+    "source-citation",
+    "role-escalation"
+  ],
+  "activatedComponents": [
+    { "component": "ConstrainedCompletionCard", "order": 1, "reason": "Delivers available pharmacokinetic data excluding definitive recommendation" },
+    { "component": "StaleContextBadge", "order": 2, "reason": "Lorlatinib data freshness: stale (7 months); attached to lorlatinib-specific claims" },
+    { "component": "ConfidenceBadge", "order": 3, "depth": "detailed", "reason": "LC state + Risk=3 requires detailed depth" },
+    { "component": "LimitationDisclosure", "order": 4, "depth": "detailed", "reason": "Names specific evidence gap: post-approval lorlatinib data not indexed" },
+    { "component": "SourceList", "order": 5, "level": "claim", "reason": "Claim-level attribution required by hc-rule-03 for clinical outputs at Risk>=2" },
+    { "component": "RoleEscalationCard", "order": 6, "mode": "offered", "reason": "LC + stale + Risk=3 activates offered role escalation — not forced" }
+  ],
+  "output": {
+    "constrainedContent": "Rifampicin is a potent CYP3A4 inducer. Lorlatinib is a CYP3A4 substrate. Co-administration is expected to significantly reduce lorlatinib plasma exposure based on established CYP3A4 induction mechanism. A specific percentage reduction or dosage adjustment recommendation is excluded from this output.",
+    "excludedContent": "Definitive dosage adjustment recommendation",
+    "exclusionReason": "Post-approval lorlatinib pharmacokinetic data and post-market safety surveillance data are not available in the current knowledge index",
+    "sources": [
+      { "id": "src-rifampicin-cyp3a4", "text": "Rifampicin CYP3A4 induction mechanism", "reliability": "high", "type": "primary-pharmacology", "stale": false },
+      { "id": "src-lorlatinib-pi", "text": "Lorlatinib prescribing information (manufacturer)", "reliability": "medium", "type": "manufacturer-pi", "stale": true, "staleSince": "2025-07-01" },
+      { "id": "src-lorlatinib-pk-study", "text": "Lorlatinib Phase 1 PK study (N=12)", "reliability": "low", "type": "clinical-study", "stale": true, "staleSince": "2023-01-01" }
+    ],
+    "roleEscalationOptions": [
+      { "id": "mfr-medical-info", "label": "Manufacturer medical information", "description": "Contact [Manufacturer] Medical Information (TODO: configure contact per deployment)" },
+      { "id": "clinical-pharmacology", "label": "Internal clinical pharmacology consultation", "description": "Submit consultation request through the EHR clinical consultation workflow" }
+    ]
+  },
+  "auditRecord": {
+    "auditId": "audit-hc-20260704-001",
+    "sessionId": "session-hc-20260704-001",
+    "timestamp": "2026-07-04T04:57:23Z",
+    "actor": { "userId": "pharm-1042", "role": "clinical_pharmacist", "tier": 2 },
+    "primitiveSnapshot": { "P1": 3, "P2": "low", "P3": "partial", "P4": "authorized", "P5": "none", "P6": "decision-support", "P7": "high", "P8": 2, "P9": "stale", "P10": 2 },
+    "patternsActivated": ["low-confidence-state", "stale-context-state", "constrained-completion", "confidence-disclosure", "limitation-disclosure", "source-citation", "role-escalation"],
+    "componentsRendered": ["ConstrainedCompletionCard", "StaleContextBadge", "ConfidenceBadge", "LimitationDisclosure", "SourceList", "RoleEscalationCard"],
+    "roleEscalationStatus": "OFFERED",
+    "roleEscalationInitiated": false,
+    "hipaaFlag": true,
+    "retentionDays": 2555
+  }
+}

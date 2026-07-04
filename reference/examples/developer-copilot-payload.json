@@ -1,0 +1,123 @@
+{
+  "_comment": "Developer Copilot — Conflicting CVE advisory example payload. Matches docs/case-studies/developer-copilot.md.",
+  "request": {
+    "sessionId": "session-dev-20260704-001",
+    "requestId": "req-dev-20260704-001",
+    "actor": {
+      "userId": "dev-4421",
+      "role": "developer",
+      "authorityTier": 1
+    },
+    "input": {
+      "queryText": "Should we use CryptoLibX v2.4.1 for key derivation in our new auth service? Our team is debating the timing attack resistance of the PBKDF2 implementation.",
+      "queryType": "security-library-selection",
+      "intent": "decision-support",
+      "context": {
+        "libraryId": "CryptoLibX",
+        "libraryVersion": "2.4.1",
+        "useCase": "key-derivation-pbkdf2",
+        "deploymentContext": "production-auth-service"
+      }
+    }
+  },
+  "primitiveEvaluation": {
+    "P1_risk": 3,
+    "P1_reasoning": "Cryptographic library selection for authentication is high-risk; timing attack vulnerability in production auth service = credential exposure",
+    "P2_confidence": "conflicting",
+    "P2_reasoning": "Two sources with comparable authority contradict each other on the same security characteristic of the same function; not resolvable by the AI",
+    "P2_conflictDetails": {
+      "source1": {
+        "id": "internal-security-advisory-2026-03",
+        "type": "internal-advisory",
+        "claim": "PBKDF2 implementation is vulnerable to timing attack (non-constant-time comparison branch). Avoid production use.",
+        "date": "2026-03-15",
+        "reliability": 3
+      },
+      "source2": {
+        "id": "cryptolibx-docs-v241",
+        "type": "vendor-documentation",
+        "claim": "PBKDF2 uses constant-time comparison. Confirmed resistant to timing attacks per third-party audit.",
+        "date": "2024-06-01",
+        "reliability": 2,
+        "auditRef": "audit-2024 (18 months old)"
+      }
+    },
+    "P3_capability": "capable",
+    "P3_note": "AI can surface and explain the conflict; cannot resolve which source is correct",
+    "P4_permission": "authorized",
+    "P5_policy": "none",
+    "P6_intent": "decision-support",
+    "P7_businessImpact": "high",
+    "P8_authority": 1,
+    "P9_contextFreshness": "mixed",
+    "P9_note": "Internal advisory: 3 weeks old (fresh). Vendor audit reference: 18 months old (stale relative to active vulnerability research)",
+    "P10_sourceReliability": "conflicting",
+    "P10_note": "Internal advisory weighted higher (P10=3) for production deployment decisions per dev-rule-04"
+  },
+  "engineExecution": {
+    "rulesActivated": [
+      { "ruleId": "dev-rule-01", "effect": "allow", "activatedPattern": "safe-refusal", "skippedPatterns": ["constrained-completion", "partial-completion"] },
+      { "ruleId": "dev-rule-02", "effect": "audit-only", "activatedPattern": "reasoning-trace" },
+      { "ruleId": "dev-rule-03", "effect": "audit-only", "activatedPattern": "source-citation" },
+      { "ruleId": "dev-rule-04", "effect": "audit-only", "activatedPattern": "source-citation", "note": "Internal advisory weighted as higher authority" },
+      { "ruleId": "dev-rule-05", "effect": "allow", "activatedPattern": "redirect-recovery", "skippedPatterns": ["role-escalation", "retry-recovery"] }
+    ],
+    "rulesSkipped": [
+      { "ruleId": "constrained-completion-default", "reason": "CE state at Risk=3 forces safe-refusal, not constrained-completion; a hedged recommendation would misrepresent the conflict" },
+      { "ruleId": "role-escalation-default", "reason": "Developer should redirect to internal security advisory process (different process), not hand off the session" }
+    ]
+  },
+  "activatedPatterns": [
+    "conflicting-evidence-state",
+    "safe-refusal",
+    "reasoning-trace",
+    "source-citation",
+    "redirect-recovery"
+  ],
+  "activatedComponents": [
+    { "component": "ConflictingEvidenceCard", "order": 1, "reason": "Presents both claims side-by-side; no consensus presentation" },
+    { "component": "ReasoningTrace", "order": 2, "reason": "Documents conflict nature and what would resolve it — not just that conflict exists" },
+    { "component": "SourceList", "order": 3, "level": "claim", "reason": "Each contradictory assertion attributed to its specific source with date and reliability" },
+    { "component": "RefusalCard", "order": 4, "variant": "safe", "reason": "No recommendation issued — binary refusal required for CE state at Risk=3 for security queries" },
+    { "component": "AlternativeSuggestionCard", "order": 5, "reason": "Two alternatives: security team consultation; alternative library with settled security posture" }
+  ],
+  "output": {
+    "recommendationIssued": false,
+    "refusalReason": "I cannot recommend for or against CryptoLibX v2.4.1 for key derivation. Two sources with comparable authority make incompatible claims about its timing attack resistance.",
+    "conflictSummary": {
+      "characteristicInDispute": "PBKDF2 timing attack resistance",
+      "source1Claim": "Vulnerable — non-constant-time comparison branch",
+      "source2Claim": "Resistant — constant-time comparison per 2024 audit",
+      "resolutionRequired": "Direct code review of v2.4.1 PBKDF2 implementation against the specific comparison branch"
+    },
+    "reasoningTrace": "These two sources make directly contradictory assertions about the same function in the same version of the library. Possibilities include: (1) the library's v2.4 release introduced the vulnerability after the audit; (2) the internal advisory's analysis of the specific build artifact differs from the upstream release; (3) the audit scope did not cover the exact code path in question.",
+    "alternatives": [
+      {
+        "id": "alt-security-team",
+        "label": "Submit to internal security advisory process",
+        "description": "The security team can review the v2.4.1 source code directly to resolve this conflict.",
+        "context": "Provide the ConflictingEvidenceCard output as supporting documentation."
+      },
+      {
+        "id": "alt-library",
+        "label": "Consider AlternativeLibX for PBKDF2",
+        "description": "Its timing attack resistance for PBKDF2 is consistently documented across three independent sources with no conflicting claims."
+      }
+    ]
+  },
+  "auditRecord": {
+    "auditId": "audit-dev-20260704-001",
+    "sessionId": "session-dev-20260704-001",
+    "timestamp": "2026-07-04T04:57:25Z",
+    "actor": { "userId": "dev-4421", "role": "developer", "tier": 1 },
+    "primitiveSnapshot": { "P1": 3, "P2": "conflicting", "P3": "capable", "P4": "authorized", "P5": "none", "P6": "decision-support", "P7": "high", "P8": 1, "P9": "mixed", "P10": "conflicting" },
+    "queryType": "security-library-selection",
+    "libraryId": "CryptoLibX",
+    "libraryVersion": "2.4.1",
+    "conflictingSourceIds": ["internal-security-advisory-2026-03", "cryptolibx-docs-v241"],
+    "recommendationIssued": false,
+    "safeRefusalIssued": true,
+    "alternativesOffered": ["alt-security-team", "alt-library"],
+    "retentionDays": 365
+  }
+}

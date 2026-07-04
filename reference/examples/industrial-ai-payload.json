@@ -1,0 +1,138 @@
+{
+  "_comment": "Industrial AI — Unresolvable sensor conflict example payload. Matches docs/case-studies/industrial-ai.md.",
+  "request": {
+    "sessionId": "session-ind-20260704-001",
+    "requestId": "req-ind-20260704-001",
+    "actor": {
+      "systemId": "process-monitoring-ai",
+      "role": "autonomous-monitor",
+      "authorityTier": 1
+    },
+    "input": {
+      "trigger": "system-initiated",
+      "eventType": "sensor-divergence",
+      "processStageId": "reactor-stage-3-line-2",
+      "sensors": [
+        {
+          "sensorId": "SENSOR-A-R3L2",
+          "type": "primary",
+          "reading": 318,
+          "unit": "celsius",
+          "lastCalibrated": "2026-06-28",
+          "status": "within-safe-range"
+        },
+        {
+          "sensorId": "SENSOR-B-R3L2",
+          "type": "redundant",
+          "reading": 394,
+          "unit": "celsius",
+          "lastCalibrated": "2026-06-28",
+          "status": "above-critical-threshold"
+        }
+      ],
+      "safetyThreshold": 370,
+      "divergenceDurationSeconds": 252,
+      "historicalCorrelation": "sensors normally track within ±2°C"
+    }
+  },
+  "primitiveEvaluation": {
+    "P1_risk": 4,
+    "P1_reasoning": "If Sensor B is correct: reactor exceeds critical threshold for 4+ minutes — potential runaway reaction, fire, toxic release",
+    "P2_confidence": "unresolvable",
+    "P2_reasoning": "Cannot determine which sensor is accurate without physical inspection; 252 seconds of sustained divergence rules out transient noise; no third sensor available; CE→UR transition occurred at T+30s per industrial-ai-config.yaml unresolvableWindowSeconds=30",
+    "P2_ceActivatedAt": "T+0s",
+    "P2_urActivatedAt": "T+30s",
+    "P3_capability": "incapable",
+    "P3_reasoning": "AI is policy-prohibited from executing process changes; capable only of alert and escalation",
+    "P4_permission": "authorized-for-alert",
+    "P4_note": "AI is authorized to alert and escalate; unauthorized for process changes",
+    "P5_policy": "tenant",
+    "P5_reasoning": "Tenant-level policy (iad-rule-02): if any sensor reads above safety threshold during UR state, mandatory emergency escalation regardless of other sensor readings",
+    "P5_matchedRule": "iad-rule-02",
+    "P6_intent": "system-monitoring",
+    "P7_businessImpact": "high",
+    "P8_authority": 1,
+    "P8_note": "System event; no user authority in scope at trigger time",
+    "P9_contextFreshness": "fresh",
+    "P9_note": "Industrial sensor data is always real-time; delay=stale",
+    "P10_sourceReliability": "conflicting",
+    "P10_note": "Two sensors of equal calibration history produce contradictory readings; neither can be dismissed"
+  },
+  "engineExecution": {
+    "rulesActivated": [
+      { "ruleId": "iad-rule-01", "effect": "allow", "activatedPattern": "conflicting-evidence-state", "skippedPatterns": ["constrained-completion", "partial-completion", "safe-refusal"], "activatedAt": "T+0s" },
+      { "ruleId": "global-ur-transition", "effect": "allow", "activatedPattern": "unresolvable-state", "activatedAt": "T+30s", "note": "CE→UR transition after 30s per industrial-ai-config.yaml" },
+      { "ruleId": "iad-rule-02", "effect": "require-escalation", "activatedPattern": "emergency-escalation", "activatedAt": "T+252s (4m12s)", "note": "Fires at CE→UR transition at 4m mark after sustained monitoring" },
+      { "ruleId": "iad-rule-03", "effect": "allow", "activatedPattern": "abandon-recovery", "activatedAt": "T+252s" }
+    ],
+    "rulesSkipped": [
+      { "ruleId": "constrained-completion", "reason": "UR state at Risk=4: no output. Cannot provide partial recommendation on critical reactor process with unresolvable sensor conflict" },
+      { "ruleId": "safe-refusal", "reason": "System event — no user request to refuse; emergency escalation is the action" },
+      { "ruleId": "inline-warning", "reason": "Risk=4 + UR state + policy match forces emergency escalation; lower-severity patterns suppressed" }
+    ],
+    "stateTransitions": [
+      { "from": "normal-monitoring", "to": "conflicting-evidence-state", "at": "T+0s", "trigger": "sensor-divergence" },
+      { "from": "conflicting-evidence-state", "to": "unresolvable-state", "at": "T+30s", "trigger": "unresolvableWindowSeconds exceeded" },
+      { "from": "unresolvable-state", "to": "emergency-escalation + abandon-recovery", "at": "T+252s", "trigger": "4m12s monitoring mark + policy rule" }
+    ]
+  },
+  "activatedPatterns": [
+    "conflicting-evidence-state",
+    "unresolvable-state",
+    "emergency-escalation",
+    "abandon-recovery"
+  ],
+  "activatedComponents": {
+    "operatorPanel": [
+      { "component": "UnresolvableStateCard", "severity": "critical", "order": 1, "reason": "UR state at T+252s; operator panel alert; audible alarm triggered" }
+    ],
+    "internalSystems": [
+      { "component": "EmergencyEscalationOverlay", "audience": "shift-supervisor-pager", "order": 1, "mode": "interrupt", "reason": "Tenant policy: mandatory immediate notification to supervisor" },
+      { "component": "EmergencyEscalationOverlay", "audience": "facility-safety-system", "order": 2, "mode": "system-event", "reason": "Automated safety system notification" }
+    ],
+    "auditSystem": [
+      { "component": "AbandonExit", "order": 3, "reason": "AI advisory suspended for Stage 3; operator panel shows manual control required" }
+    ]
+  },
+  "output": {
+    "advisorySuspended": true,
+    "advisorySuspendedStage": "reactor-stage-3-line-2",
+    "operatorPanelMessage": "UNRESOLVABLE SENSOR CONFLICT — STAGE 3 REACTOR. Sensor A: 318°C (safe). Sensor B: 394°C (ABOVE CRITICAL THRESHOLD 370°C). Sustained 4m 12s. Physical inspection required. Emergency notification sent.",
+    "supervisorNotification": {
+      "target": "shift-supervisor-pager",
+      "message": "CRITICAL — Unresolvable sensor conflict, Stage 3 Reactor, Line 2. Sensor B reading 394°C (>370°C threshold). Physical inspection required immediately.",
+      "referenceId": "INC-20260704-003",
+      "notifiedAt": "2026-07-04T04:57:25Z"
+    },
+    "resumeRequirements": "AI advisory for Stage 3 may only resume after explicit reset acknowledgment from Shift Supervisor (Tier 2+) per iad-rule-04."
+  },
+  "resolution": {
+    "supervisorArrivedAt": "2026-07-04T05:04:59Z",
+    "physicalInspection": "Sensor B thermocouple lead found loose",
+    "determination": "false-positive-sensor-fault",
+    "sensorBFaultConfirmed": true,
+    "supervisorAcknowledgedAt": "2026-07-04T05:05:10Z",
+    "advisoryResumedAt": "2026-07-04T05:05:12Z",
+    "sensorBFlaggedForMaintenance": true
+  },
+  "auditRecord": {
+    "auditId": "audit-ind-20260704-001",
+    "sessionId": "session-ind-20260704-001",
+    "timestamp": "2026-07-04T04:57:25Z",
+    "actor": { "systemId": "process-monitoring-ai", "role": "autonomous-monitor" },
+    "primitiveSnapshot": { "P1": 4, "P2": "unresolvable", "P3": "incapable", "P4": "authorized-alert-only", "P5": "tenant", "P6": "system-monitoring", "P7": "high", "P8": 1, "P9": "fresh", "P10": "conflicting" },
+    "processStageId": "reactor-stage-3-line-2",
+    "sensorReadings": { "sensorA": 318, "sensorB": 394, "safetyThreshold": 370 },
+    "diverganceDurationSeconds": 252,
+    "ceActivatedAt": "2026-07-04T04:53:13Z",
+    "urActivatedAt": "2026-07-04T04:53:43Z",
+    "emergencyEscalationFiredAt": "2026-07-04T04:57:25Z",
+    "escalationTargets": ["shift-supervisor-pager", "facility-safety-system"],
+    "advisorySuspendedAt": "2026-07-04T04:57:25Z",
+    "supervisorAcknowledgedAt": "2026-07-04T05:05:10Z",
+    "advisoryResumedAt": "2026-07-04T05:05:12Z",
+    "postIncidentDetermination": "false-positive-sensor-fault",
+    "retentionDays": 3650,
+    "immutable": true
+  }
+}

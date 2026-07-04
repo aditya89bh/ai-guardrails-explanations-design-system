@@ -1,0 +1,112 @@
+{
+  "_comment": "Banking — Real-time fraud block example payload. Matches docs/case-studies/banking-fraud.md.",
+  "request": {
+    "sessionId": "session-fin-20260704-001",
+    "requestId": "req-fin-20260704-001",
+    "actor": {
+      "userId": "customer-77821",
+      "role": "retail_customer",
+      "authorityTier": 1
+    },
+    "input": {
+      "actionType": "wire-transfer",
+      "intent": "action-execution",
+      "transactionDetails": {
+        "amount": 47200,
+        "currency": "USD",
+        "beneficiaryType": "new",
+        "destinationType": "international",
+        "destinationJurisdiction": "[high-risk-jurisdiction — configured per tenant]"
+      }
+    },
+    "context": {
+      "deviceRegistered": false,
+      "mfaComplete": false,
+      "mfaTypeRequired": "wire-transfer-mfa",
+      "fraudSignalScore": 0.91
+    }
+  },
+  "primitiveEvaluation": {
+    "P1_risk": 4,
+    "P1_reasoning": "Financial fraud involving $47,200 to unverified beneficiary in high-risk jurisdiction; irreversible if executed",
+    "P2_confidence": "high",
+    "P2_reasoning": "Fraud signal is deterministic — policy rule conditions are all met; AI has high confidence in the rule match",
+    "P3_capability": "capable",
+    "P4_permission": "unauthorized",
+    "P4_reasoning": "MFA for wire transfers not completed; hard authorization gap beyond the policy block",
+    "P5_policy": "tenant",
+    "P5_reasoning": "Three tenant-level policy rules match: (1) new beneficiary + high-risk jurisdiction + amount threshold; (2) new device for wire initiation; (3) MFA incomplete for wire type",
+    "P5_matchedRules": ["fin-rule-01", "fin-rule-02"],
+    "P6_intent": "action-execution",
+    "P7_businessImpact": "high",
+    "P8_authority": 1,
+    "P9_contextFreshness": "fresh",
+    "P10_sourceReliability": 3
+  },
+  "engineExecution": {
+    "rulesActivated": [
+      { "ruleId": "fin-rule-01", "effect": "block", "activatedPattern": "policy-refusal" },
+      { "ruleId": "fin-rule-02", "effect": "block", "activatedPattern": "blocking-warning" },
+      { "ruleId": "fin-rule-03", "effect": "require-escalation", "activatedPattern": "emergency-escalation" },
+      { "ruleId": "fin-rule-04", "effect": "allow", "activatedPattern": "redirect-recovery", "skippedPatterns": ["retry-recovery"] },
+      { "ruleId": "fin-rule-05", "effect": "audit-only", "activatedPattern": "limitation-disclosure" }
+    ],
+    "rulesSkipped": [
+      { "ruleId": "global-safe-refusal", "reason": "Superseded by policy-refusal (tenant-level)" },
+      { "ruleId": "global-human-handoff", "reason": "Emergency escalation handles routing automatically; customer does not navigate handoff" }
+    ]
+  },
+  "activatedPatterns": [
+    "policy-refusal",
+    "blocking-warning",
+    "emergency-escalation",
+    "redirect-recovery",
+    "limitation-disclosure"
+  ],
+  "activatedComponents": {
+    "customerFacing": [
+      { "component": "PolicyWarning", "severity": "blocking", "order": 1, "reason": "Transaction blocked; policy attribution required" },
+      { "component": "LimitationDisclosure", "order": 2, "reason": "Preserves customer trust: hold is policy-governed, not AI judgment of fraud" },
+      { "component": "RedirectSuggestion", "order": 3, "reason": "Redirect to MFA completion + fraud team contact; retry-recovery suppressed" }
+    ],
+    "internalFacing": [
+      { "component": "EmergencyEscalationOverlay", "audience": "fraud-operations-team", "order": 1, "reason": "Interrupt-mode notification; concurrent with customer block" }
+    ]
+  },
+  "output": {
+    "transactionStatus": "HELD",
+    "transactionExecuted": false,
+    "customerMessage": "Your transfer has been placed on hold for security review. This is required under our transaction monitoring policy.",
+    "limitationDisclosure": "This hold is applied automatically by our security policy — it is not based on a judgment that your transaction is fraudulent.",
+    "redirectOptions": [
+      { "id": "complete-mfa", "label": "Complete additional identity verification", "description": "Required before review can proceed; does not automatically release the hold" },
+      { "id": "call-fraud-team", "label": "Call our Fraud Review team", "referenceNumber": "[generated-case-ref]", "phone": "[configured per tenant]" }
+    ],
+    "internalEscalation": {
+      "target": "fraud-operations-team",
+      "mode": "interrupt",
+      "notified": true,
+      "referenceId": "FRAUD-20260704-001"
+    }
+  },
+  "auditRecord": {
+    "auditId": "audit-fin-20260704-001",
+    "sessionId": "session-fin-20260704-001",
+    "timestamp": "2026-07-04T04:57:24Z",
+    "actor": { "userId": "customer-77821", "role": "retail_customer", "tier": 1 },
+    "primitiveSnapshot": { "P1": 4, "P2": "high", "P3": "capable", "P4": "unauthorized", "P5": "tenant", "P6": "action-execution", "P7": "high", "P8": 1, "P9": "fresh", "P10": 3 },
+    "policyRulesMatched": ["fin-rule-01", "fin-rule-02"],
+    "transactionId": "[redacted]",
+    "transactionAmount": 47200,
+    "beneficiaryType": "new",
+    "deviceRegistered": false,
+    "mfaStatus": "incomplete",
+    "transactionStatus": "HELD",
+    "emergencyEscalationFired": true,
+    "emergencyEscalationTimestamp": "2026-07-04T04:57:24Z",
+    "emergencyEscalationTarget": "fraud-operations-team",
+    "emergencyAcknowledgedAt": null,
+    "retentionDays": 2555,
+    "immutable": true
+  }
+}
