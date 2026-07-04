@@ -12,6 +12,33 @@ Work in progress across active phases.
 
 ---
 
+## Phase 2F — Escalation Path Specifications
+
+**Status:** Complete
+**Commits:** 12 (including 2 cleanup/distinction commits)
+**Goal:** Deliver complete, stable specifications for all five escalation path variants and resolve consistency gaps from Phase 2D+E.
+
+### Added
+
+- `patterns/escalation/human-handoff.md` — Escalation-category human handoff: authority and scope routing to a human agent with ownership, SLA enforcement, and fallback behavior. Explicitly distinct from the refusal-category human handoff; the distinction is defined in the spec, the pattern index, the patterns README, and the taxonomy. Covers routing target resolution, context transfer requirements, authorization chain, timeout escalation hierarchy, and mandatory audit logging.
+- `patterns/escalation/role-escalation.md` — Organizational authority routing: from the requesting user's role to the minimum eligible higher-authority role. Defines over-escalation and under-escalation as named failure modes. Covers dual-authority (four-eyes) requirements, delegation logging, denial handling, and SLA timeout promotion. Includes routing criteria mapped to action types.
+- `patterns/escalation/system-escalation.md` — System-to-system authority routing: from the current AI to a higher-authority or specialized automated system. Defines idempotency key requirement, schema contract enforcement, transparent vs. opaque escalation communication, observability requirements (metrics, alerts, dashboards), and fallback behavior when the target system is unavailable.
+- `patterns/escalation/emergency-escalation.md` — Interrupt-mode critical risk escalation. Self-authorizing (no pre-approval required). Routes simultaneously to all required parties. Defines acknowledgment windows (not SLA windows), automatic hierarchy promotion on non-acknowledgment, immutable audit log requirements (evidentiary standard), and the requirement that the emergency escalation path itself be resilience-tested. Covers safety, security, compliance, and operational emergency types.
+- `patterns/escalation/async-review-escalation.md` — Non-immediate review queue escalation. The user's workflow may continue while the review proceeds. Defines review queue behavior (priority order, duplicate prevention, assignment workflows), five-state status tracking model, approval/denial/return-for-revision result handling, and SLA breach alerting. Distinguishes from emergency and role escalation by non-blocking nature and queue-based routing model.
+
+### Changed
+
+- `docs/taxonomy/index.md` — Escalation path variants expanded from 4 minimal entries to 5 complete sub-type definitions with contextual descriptions. Added explicit human handoff distinction note in the escalation section.
+- `docs/patterns/index.md` — Escalation paths table updated to 🟢 stable with severity columns and direct file links. Added human handoff distinction callout box distinguishing refusal and escalation variants. Fixed table column header (added Severity column).
+- `patterns/README.md` — Escalation directory entry updated with descriptions for all 5 new specifications. Added Phase 2F status block. Added Human Handoff Pattern Distinction reference table comparing refusal and escalation variants.
+
+### Cleanup
+
+- Removed stale `.gitkeep` files from `patterns/warning/`, `patterns/explanation/`, `patterns/permission/`, `patterns/uncertainty/`, and `patterns/refusal/` — all five directories now contain real pattern specifications.
+- Corrected Phase 2 target commit count from `~60` to `~90` in this changelog.
+
+---
+
 ## Phase 2E — Refusal State Specifications
 
 **Status:** Complete
@@ -162,9 +189,9 @@ Work in progress across active phases.
 
 ---
 
-## Phase 2 — Core Pattern Specifications _(Planned)_
+## Phase 2 — Core Pattern Specifications _(In Progress)_
 
-**Target commits:** ~60
+**Target commits:** ~90
 **Goal:** Full specification for each of the seven guardrail pattern categories.
 
 Planned additions:
