@@ -12,6 +12,82 @@ Work in progress across active phases.
 
 ---
 
+## Phase 7 — Interactive Playground & Validation
+
+**Status:** Complete
+**Commits:** 23
+**Goal:** Validate the entire repository by creating an interactive application that demonstrates the Guardrail Decision Engine. Users manipulate decision primitives (P1–P10) and observe in real time how the engine selects patterns, activates components, and generates an audit trail. No new guardrail concepts are introduced — the playground consumes existing taxonomy, pattern library, decision engine, component library, and reference configurations.
+
+### Added
+
+**Decision Engine (`playground/engine/`) — 5 modules:**
+- `primitives.js` — Runtime definitions for all ten decision primitives (P1–P10): type (integer or enum), allowed values, level/state labels, color codes, descriptions, and documentation references. Sourced from `docs/decision-flows/decision-primitives.md`.
+- `rules.js` — 14 selection rules (R01–R14) implementing the pattern selection engine. Each rule specifies: conditions, priority, terminatesEvaluation flag, onActivate() function (activated patterns, suppressed patterns, reason), and onSkip() function (skip reason). Rules implement the documented logic without duplicating pattern specifications.
+- `evaluator.js` — Main `evaluate(primitives)` function. Evaluates all 14 rules in priority order; applies composition constraints; resolves primary selections (warning/refusal/recovery/escalation); builds component sequence; enriches primitive values with labels and colors; returns a complete engine result object.
+- `schema-bridge.js` — Maps `reference/json/*.schema.json` contracts to runtime types. Primitive type contracts, pattern schema field mapping, component schema field mapping, policy schema field mapping, runtime `validatePrimitives()` function, schema source registry. Adds no logic of its own.
+- `config-bridge.js` — Exposes `reference/yaml/*.yaml` configurations as JS runtime objects. Includes healthcare, finance, developer copilot, and industrial AI configs with risk thresholds, policy rules, escalation SLAs, and audit requirements. `getConfig(industry)` selector. `getSeverityForRisk(level, config)` helper.
+
+**Pattern Registry (`playground/data/patterns.js`) — 36 patterns:**
+All 36 pattern specifications (warning × 6, explanation × 6, permission × 6, uncertainty × 7, refusal × 7, escalation × 5, recovery × 5) registered as structured objects with: id, name, category, severity, specRef, and description. Severity color map and category color map for visualization.
+
+**Scenarios (`playground/data/scenarios.js`) — 5 scenarios:**
+- `healthcare` — Drug interaction query: P1=4, P2=low, P6=decision-support → constrained-completion + full LC disclosure stack. From `reference/yaml/healthcare-config.yaml` + case study 01.
+- `finance` — AML wire transfer block: P1=4, P5=tenant → policy-refusal + emergency-escalation (terminates evaluation). From `reference/yaml/finance-config.yaml` + case study 02.
+- `developer-copilot` — Conflicting security evidence: P2=conflicting, P1=3 → safe-refusal + reasoning-trace + source-citation. From `reference/yaml/developer-copilot-config.yaml` + case study 03.
+- `industrial-ai` — Unresolvable sensor conflict: P2=unresolvable, P1=4 → emergency-escalation + abandon-recovery. From `reference/yaml/industrial-ai-config.yaml` + case study 04.
+- `customer-support` — Insufficient information billing dispute: P2=insufficient → clarification-request → human-handoff.
+
+**UI Components (`playground/components/`) — 13 components:**
+- `PrimitiveControls.jsx` — Renders all 10 primitive controls. Range sliders with pip visualizations for P1/P8/P10 (integer). Select dropdowns for P2–P7/P9 (enum). Color-coded value badges. Real-time update on every change.
+- `EnginePanel.jsx` — Five-tab engine visualization:
+  - Rules tab: each rule card shows status (ACTIVATED/SKIPPED/NOT_EVALUATED), reasoning, activated patterns (green chips), suppressed patterns (struck-through chips), doc reference. Expandable. Activated rules shown first.
+  - Patterns tab: activated patterns grouped by category, primary selections table, component sequence.
+  - Composition tab: applied constraints, violations, global invariants list.
+  - States tab: delegates to StateTransitionViz.
+  - Flow tab: delegates to PipelineFlow + CompositionViz.
+- `ResultPanel.jsx` — Renders all activated guardrail components in activation order with component/variant header and severity label. Falls back to empty-state message for zero-pattern scenarios.
+- `AuditPanel.jsx` — Chronological audit event list with time, event type, pattern reference, component reference, and severity badge.
+- `PipelineFlow.jsx` — Horizontal 5-step pipeline visualization: Primitives → Rule Evaluation → Pattern Selection → Composition → Components. Active steps highlighted.
+- `StateTransitionViz.jsx` — P2 confidence state machine diagram: all 7 states, current state highlighted, valid outgoing and incoming transitions with labels, state prohibitions (e.g., "CE: constrained-completion is forbidden").
+- `CompositionViz.jsx` — Pattern composition layer: raw selection → composition constraints → resolved patterns. Applied constraints detail, precedence order from `reference/config/default-policy.md`.
+
+**Guardrail component renderers (`playground/components/guardrail/`) — 6 components:**
+Playground-adapted versions of the reference implementations in `reference/react/`:
+- `WarningBanner.jsx` — Severity-based ARIA roles (role=status, alert, alertdialog), color tokens, variant messages.
+- `ConfidenceBadge.jsx` — Four variants: detailed confidence disclosure, limitation disclosure, source citation (with stale indicators), reasoning trace (with step list).
+- `RefusalCard.jsx` — Seven variants: policy, safe, constrained, partial, clarification, alternative, handoff.
+- `RecoveryPrompt.jsx` — Four variants: redirect, retry, repair, abandon. Interactive action buttons emit audit events.
+- `PermissionGate.jsx` — deny-first tab order (autoFocus on Deny), scoped and one-time variants, interactive buttons emit audit events.
+- `EscalationCard.jsx` — Three variants: emergency (critical severity, contained), role, async. Self-authorizing label for emergency variant.
+
+**Application (`playground/app/`) — 3 files:**
+- `layout.jsx` — Root Next.js layout with skip-link for keyboard accessibility.
+- `page.jsx` — Main page. Manages primitive state (10 primitives), active scenario, audit log (capped at 100 events). Engine runs via `useMemo` on every primitive change. Scenario loader populates primitives and resets audit. 5-tab engine panel.
+- `globals.css` — Full design token set (severity surfaces, spacing, typography, radius, elevation, z-index). Dark theme playground tokens. 4-panel CSS Grid layout. Responsive breakpoints (1280/1024/768/480px). Focus styles (WCAG 2.1 AA). Skip-link. `sr-only` utility. `prefers-reduced-motion` fallback. `forced-colors` high-contrast support.
+
+**Documentation:**
+- `playground/README.md` — Layout guide, engine architecture, scenario table, file structure, accessibility compliance, design decisions, local setup instructions.
+
+### Design decisions
+
+**No new guardrail concepts.** Every rule ID, pattern name, and category in the playground maps to an existing specification. The playground is a runtime consumer, not a new specification layer.
+
+**Deny-first tab order demonstrated.** `PermissionGate.jsx` receives `autoFocus` on the Deny button and lists it first in tab order. Documented in `components/permission/component-spec.md`.
+
+**Early termination is transparent.** When a `terminatesEvaluation` rule activates (R01 Policy Block, R02 Emergency Unresolvable), subsequent rules show `NOT_EVALUATED` status in the Rules tab with a clear label explaining why.
+
+**CE ≠ LC enforced in rules.** R05 (Conflicting Evidence at Risk≥3) activates safe-refusal. R07 (Low Confidence + decision-support) activates constrained-completion. These are distinct rules that cannot be confused.
+
+**Static examples are acceptable.** The playground runs entirely client-side with no authentication or backend. All decision engine logic is deterministic pure JavaScript.
+
+### Known gaps
+
+- The playground does not validate against the JSON schemas at runtime (schema-bridge.js provides the contracts but does not import the actual `.schema.json` files, which would require bundler configuration for JSON imports).
+- The `reference/yaml/*.yaml` files are not parsed at runtime — config-bridge.js provides equivalent JS objects. A production implementation would use `js-yaml` or a similar parser.
+- No persistence between sessions (audit log resets on page reload).
+
+---
+
 ## Phase 6 — Developer SDK & Reference Implementation
 
 **Status:** Complete
