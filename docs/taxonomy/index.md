@@ -51,20 +51,24 @@ Every pattern has an associated severity level that determines the friction it i
 
 | Sub-type | Definition |
 |---|---|
-| **Confidence disclosure** | Communicates the AI's confidence level for a specific output |
-| **Source citation** | References the data, documents, or knowledge the AI used |
-| **Reasoning trace** | Exposes the steps or logic the AI used to reach a conclusion |
-| **Decision summary** | Summarizes why the AI took an action or produced an output |
-| **Limitation disclosure** | Communicates the boundaries of what the AI can reliably do |
+| **Confidence disclosure** | Communicates the AI's degree of certainty in an output via user-meaningful labels — not raw model probabilities. Operates at surface, contextual, or detailed depth. |
+| **Source citation** | Discloses the specific documents, datasets, or knowledge sources the AI used. Operates at summary, list, linked, or claim-level depth. Must reference only verified, retrieved sources — never fabricated. |
+| **Reasoning trace** | Provides a structured, user-readable account of the logical steps the AI took from input to output. Operates at summary, step-by-step, or annotated depth. Must not post-hoc rationalize — the trace must reflect actual reasoning. |
+| **Decision summary** | A structured record of a significant AI-assisted decision: inputs, AI recommendation, user decision, and any override rationale. Standard, extended, or compliance depth. Immutable after user confirmation. |
+| **Limitation disclosure** | Communicates a specific, functional boundary of the AI's capability relevant to the current request — training cutoff, domain gap, access restriction, or task type boundary. Directs users to appropriate alternatives. |
+| **Structured uncertainty disclosure** | A composite artifact combining confidence disclosure and limitation disclosure for high-stakes outputs. Answers three questions in one place: how confident, what constrains that confidence, and what the user should do given this uncertainty. |
 
 ### Permission Gate Variants
 
 | Sub-type | Definition |
 |---|---|
-| **Soft gate** | User acknowledgment required, but low friction. One-click confirm. |
-| **Hard gate** | Explicit confirmation with consequences displayed. Requires deliberate action. |
-| **Audit-required gate** | Permission must be logged; may require secondary authorization |
-| **Delegated gate** | Authorization must come from a different user role or system |
+| **One-time permission** | Authorization for a single, specific AI action instance. Does not persist. Each subsequent execution requires a new request. |
+| **Session permission** | Authorization for a defined action category for the duration of the current session. Expires at session end. |
+| **Persistent permission** | Standing authorization for a defined action category across all future sessions, until explicitly revoked. Must be explicitly scoped; unbounded persistent permissions are not permitted. |
+| **Scoped permission** | Authorization bounded to a specific resource, data set, or target — not an action category in the abstract. May combine with one-time, session, or persistent duration. |
+| **Delegated permission** | Authorization request routed to a third party (a different user or role) who has the authority to grant or deny on behalf of the requester. Action is held pending until the approver responds. |
+| **Revocation** | The withdrawal of a previously granted permission. Always available for all permission types. Takes effect immediately. Does not roll back actions already completed under the permission. |
+| **Audit-required gate** | A permission gate that mandates logging of the authorization event and, in some configurations, secondary sign-off. Layered over other permission sub-types in high-compliance contexts. |
 
 ### Uncertainty State Variants
 
