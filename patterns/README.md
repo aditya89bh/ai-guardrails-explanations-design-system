@@ -54,11 +54,11 @@ patterns/
 ├── escalation/                      # Escalation path specifications
 │   │                                # Note: escalation/human-handoff.md is distinct from
 │   │                                # refusal/human-handoff.md — see distinction note below
-│   ├── human-handoff.md             # Escalation: authority/scope routing; focus on ownership + SLA
-│   ├── role-escalation.md
-│   ├── system-escalation.md
-│   ├── emergency-escalation.md
-│   └── async-review-escalation.md
+│   ├── human-handoff.md             # Authority/scope routing to a human; focus on ownership, SLA, fallback
+│   ├── role-escalation.md           # Current role → higher-authority role; governed by org role hierarchy
+│   ├── system-escalation.md         # Current AI → higher-authority system; API contract, retry, observability
+│   ├── emergency-escalation.md      # Critical risk; interrupt mode; simultaneous multi-party routing
+│   └── async-review-escalation.md  # Non-immediate review queue; SLA-governed; user workflow continues
 └── recovery/                        # Recovery flow specifications
     ├── retry-recovery.md
     ├── redirect-recovery.md
@@ -203,5 +203,11 @@ Do not merge these specifications. Both serve distinct functions in the pattern 
   - `clarification-request.md` ✅
   - `human-handoff.md` ✅
   - `policy-refusal.md` ✅
-- **Phase 2F–2G:** Escalation paths and recovery flows — planned
+- **Phase 2F:** Escalation path category — 5 specifications stable ✅
+  - `patterns/escalation/human-handoff.md` ✅
+  - `patterns/escalation/role-escalation.md` ✅
+  - `patterns/escalation/system-escalation.md` ✅
+  - `patterns/escalation/emergency-escalation.md` ✅
+  - `patterns/escalation/async-review-escalation.md` ✅
+- **Phase 2G:** Recovery flows — planned
 - **Phase 2 target:** Full specifications for all ~38 patterns across all seven categories
