@@ -1,0 +1,76 @@
+name: Playground Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'playground/**'
+      - '.github/workflows/playground-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'playground/**'
+      - '.github/workflows/playground-build.yml'
+
+jobs:
+  build:
+    name: Build Playground
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: playground/package-lock.json
+
+      - name: Install dependencies
+        working-directory: playground
+        run: npm ci --prefer-offline
+
+      - name: Build playground
+        working-directory: playground
+        run: npm run build
+
+      - name: Verify build output
+        working-directory: playground
+        run: |
+          echo "Checking for build output..."
+          if [ ! -d ".next" ]; then
+            echo "ERROR: .next directory not found"
+            exit 1
+          fi
+          echo "Build output verified."
+
+      - name: Check engine files are present
+        run: |
+          echo "Checking engine module files..."
+          for f in \
+            playground/engine/primitives.js \
+            playground/engine/rules.js \
+            playground/engine/evaluator.js \
+            playground/engine/schema-bridge.js \
+            playground/engine/config-bridge.js; do
+            if [ ! -f "$f" ]; then
+              echo "ERROR: Missing engine file: $f"
+              exit 1
+            fi
+          done
+          echo "All engine files present."
+
+      - name: Check data files are present
+        run: |
+          echo "Checking data files..."
+          for f in \
+            playground/data/patterns.js \
+            playground/data/scenarios.js; do
+            if [ ! -f "$f" ]; then
+              echo "ERROR: Missing data file: $f"
+              exit 1
+            fi
+          done
+          echo "All data files present."

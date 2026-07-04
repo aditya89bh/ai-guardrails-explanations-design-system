@@ -1,0 +1,56 @@
+name: Link Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - '.github/workflows/link-check.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.md'
+      - '.github/workflows/link-check.yml'
+  schedule:
+    - cron: '0 9 * * 1'
+
+jobs:
+  check-links:
+    name: Check Internal Links
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdown-link-check
+        run: npm install -g markdown-link-check
+
+      - name: Create link check config
+        run: |
+          cat > .markdown-link-check.json << 'EOF'
+          {
+            "ignorePatterns": [
+              { "pattern": "^https://github.com/your-org" },
+              { "pattern": "^http://localhost" }
+            ],
+            "aliveStatusCodes": [200, 206],
+            "timeout": "10s",
+            "retryOn429": true,
+            "retryCount": 3,
+            "fallbackRetryDelay": "30s"
+          }
+          EOF
+
+      - name: Check links in all Markdown files
+        run: |
+          find . -name "*.md" \
+            -not -path "./node_modules/*" \
+            -not -path "./playground/node_modules/*" \
+            -not -path "./playground/.next/*" \
+            | xargs -I {} markdown-link-check {} --config .markdown-link-check.json

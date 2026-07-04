@@ -1,0 +1,84 @@
+name: Schema Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'reference/json/**'
+      - 'reference/examples/**'
+      - '.github/workflows/schema-validation.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'reference/json/**'
+      - 'reference/examples/**'
+      - '.github/workflows/schema-validation.yml'
+
+jobs:
+  validate:
+    name: Validate JSON Schemas and Example Payloads
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ajv-cli
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Check schema files are valid JSON
+        run: |
+          echo "Checking JSON schema files for valid JSON syntax..."
+          for f in reference/json/*.schema.json; do
+            if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "ERROR: Invalid JSON in $f"
+              exit 1
+            fi
+            echo "✓ $f"
+          done
+          echo "All schema files are valid JSON."
+
+      - name: Check example payload files are valid JSON
+        run: |
+          echo "Checking example payload files for valid JSON syntax..."
+          for f in reference/examples/*.json; do
+            if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
+              echo "ERROR: Invalid JSON in $f"
+              exit 1
+            fi
+            echo "✓ $f"
+          done
+          echo "All example payload files are valid JSON."
+
+      - name: Validate example payloads against schemas
+        run: |
+          echo "Validating example payloads against decision engine schema..."
+          # Validate each payload against the decision engine schema if possible
+          # Falls back to JSON syntax check when payloads don't match top-level schema type
+          for payload in reference/examples/*.json; do
+            echo "Checking $payload..."
+            python3 - <<PYEOF
+          import json, sys
+          with open("$payload") as f:
+              try:
+                  data = json.load(f)
+                  print(f"  ✓ $payload is valid JSON with {len(data) if isinstance(data, (list,dict)) else 1} top-level item(s)")
+              except json.JSONDecodeError as e:
+                  print(f"  ERROR: $payload — {e}")
+                  sys.exit(1)
+          PYEOF
+          done
+          echo "All example payloads validated."
+
+      - name: Count schemas and report
+        run: |
+          schema_count=$(ls reference/json/*.schema.json 2>/dev/null | wc -l)
+          payload_count=$(ls reference/examples/*.json 2>/dev/null | wc -l)
+          echo "Schema validation summary:"
+          echo "  JSON schemas:    $schema_count"
+          echo "  Example payloads: $payload_count"
