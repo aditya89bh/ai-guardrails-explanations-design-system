@@ -1,6 +1,8 @@
 # Contributing to the AI Guardrails & Explanations Design System
 
-This document defines the contribution standards for this repository. All contributors — whether adding new patterns, refining existing specifications, or expanding documentation — should follow these guidelines.
+Thank you for your interest in contributing. This document defines the contribution standards for this repository. All contributors — whether adding new patterns, refining existing specifications, or improving the playground — should follow these guidelines.
+
+**Quick links:** [docs/glossary.md](docs/glossary.md) · [docs/getting-started.md](docs/getting-started.md) · [SUPPORT.md](SUPPORT.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ---
 
@@ -137,3 +139,38 @@ Contributions are reviewed against the following criteria:
 - Open an issue to discuss a new pattern before writing a full specification.
 - Use the `docs/case-studies/` section to propose a reference implementation for review.
 - See the [`templates/`](templates/) directory for starting-point templates.
+- Read [SUPPORT.md](SUPPORT.md) for additional help channels.
+
+---
+
+## Playground Contributions
+
+When contributing to `playground/`:
+
+- The playground must not introduce new guardrail concepts. It visualizes existing patterns only.
+- All engine changes must reference a specific rule in `docs/decision-flows/pattern-selection-engine.md`.
+- All new scenarios must reference an existing case study in `docs/case-studies/`.
+- Run `npm run build` in `playground/` before opening a pull request. A broken build will be rejected.
+- Verify that `playground/engine/rules.js` changes do not change rule output for the existing 5 scenarios.
+
+---
+
+## Schema Contributions
+
+When modifying `reference/json/`:
+
+- Do not remove existing fields (breaking change).
+- All new fields must be documented in `reference/README.md`.
+- Add or update the example objects in the schema files.
+- Validate any example payloads in `reference/examples/` against the updated schema.
+
+---
+
+## First Contribution
+
+Looking for a good first issue? Start with:
+
+- Fixing a broken internal link (search for `TODO: link`)
+- Improving an antipattern section in a pattern spec
+- Adding a missing entry to `docs/glossary.md`
+- Correcting a typo or clarity issue in a decision flow document
