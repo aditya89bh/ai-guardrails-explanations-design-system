@@ -56,6 +56,35 @@ This is an open-source project maintained by contributors. There are no guarante
 
 ---
 
+## Support Lifecycle
+
+| Version | Support status | Notes |
+|---|---|---|
+| `v1.0.x` (current) | Active support | Receives patch fixes |
+| Pre-release drafts | No support | Experimental only |
+
+**Active support** means:
+- Security vulnerabilities are addressed (see [SECURITY.md](SECURITY.md))
+- Critical specification errors are corrected
+- Broken CI is fixed
+
+**Active support does not include:**
+- New feature development
+- Framework-specific integration help
+- Compliance review or certification
+
+---
+
+## Deprecation Policy
+
+Deprecations are announced in `CHANGELOG.md` with a minimum notice period of one major version.
+
+- A pattern or feature deprecated in v1.x will be removed no earlier than v2.0.0
+- Deprecation notices include the reason and recommended migration path
+- No pattern specifications, schema fields, or taxonomy terms are deprecated in v1.0.0
+
+---
+
 ## Out of Scope
 
 This project does not provide:
