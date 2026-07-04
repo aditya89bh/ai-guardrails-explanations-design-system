@@ -106,15 +106,19 @@ Refusal states describe the AI's interaction strategy when it cannot fulfill a r
 
 ## Escalation Paths
 
-Escalation paths route a request, decision, or situation to a higher authority when the AI's scope, confidence, or authorization is insufficient.
+Escalation paths route a request, decision, incident, or exception to a higher authority — human or system — when the AI's authorization level, confidence ceiling, or policy scope is insufficient to proceed. Escalation paths focus on routing, context transfer, ownership, SLA, and fallback behavior.
+
+> **Human Handoff — two distinct patterns exist:**
+> - **Refusal Human Handoff** (`patterns/refusal/human-handoff.md`) — the AI cannot complete the request and routes the user to a person as its refusal strategy. The trigger is the AI's inability to fulfill the request.
+> - **Escalation Human Handoff** (`patterns/escalation/human-handoff.md`) — the system routes a request, decision, incident, or exception to a person because the AI's authority, policy scope, or authorization level is insufficient. The trigger is scope or authorization, not inability.
 
 | Pattern | Sub-type | Status | File |
 |---|---|---|---|
-| Human Handoff | Human handoff | 🔲 | `patterns/escalation/human-handoff.md` |
-| Role Escalation | Role escalation | 🔲 | `patterns/escalation/role-escalation.md` |
-| System Escalation | System escalation | 🔲 | `patterns/escalation/system-escalation.md` |
-| Emergency Escalation | Emergency | 🔲 | `patterns/escalation/emergency-escalation.md` |
-| Asynchronous Review Escalation | Async review | 🔲 | `patterns/escalation/async-review-escalation.md` |
+| Human Handoff (escalation) | Human escalation | 🔲 | `patterns/escalation/human-handoff.md` |
+| Role Escalation | Role authority | 🔲 | `patterns/escalation/role-escalation.md` |
+| System Escalation | System authority | 🔲 | `patterns/escalation/system-escalation.md` |
+| Emergency Escalation | Critical risk | 🔲 | `patterns/escalation/emergency-escalation.md` |
+| Async Review Escalation | Non-immediate review | 🔲 | `patterns/escalation/async-review-escalation.md` |
 
 ---
 

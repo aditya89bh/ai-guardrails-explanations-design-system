@@ -49,10 +49,12 @@ patterns/
 │   ├── constrained-completion.md    # Complete with disclosed modifications applied
 │   ├── alternative-suggestion.md    # Refuse the form; offer alternatives for the goal
 │   ├── clarification-request.md     # Defer pending targeted user input
-│   ├── human-handoff.md             # Route to human for expertise or authority
+│   ├── human-handoff.md             # Refusal: AI cannot complete; routes to human as refusal strategy
 │   └── policy-refusal.md            # Rule-governed refusal; specific policy cited
 ├── escalation/                      # Escalation path specifications
-│   ├── human-handoff.md
+│   │                                # Note: escalation/human-handoff.md is distinct from
+│   │                                # refusal/human-handoff.md — see distinction note below
+│   ├── human-handoff.md             # Escalation: authority/scope routing; focus on ownership + SLA
 │   ├── role-escalation.md
 │   ├── system-escalation.md
 │   ├── emergency-escalation.md
@@ -137,6 +139,22 @@ Links to case studies or examples that demonstrate this pattern in context.
 | `review` | Specification is complete and awaiting review |
 | `stable` | Specification has been reviewed and is authoritative |
 | `deprecated` | Pattern has been superseded or removed |
+
+---
+
+## Human Handoff — Pattern Distinction
+
+Two `human-handoff.md` files exist in this repository. They are related but serve different purposes:
+
+| | Refusal Human Handoff | Escalation Human Handoff |
+|---|---|---|
+| **File** | `patterns/refusal/human-handoff.md` | `patterns/escalation/human-handoff.md` |
+| **Trigger** | AI cannot complete the request | AI lacks authority, policy scope, or authorization |
+| **Focus** | User communication; adjacent task offer; context passing to agent | Routing mechanics; ownership assignment; SLA; fallback behavior |
+| **Category** | Refusal state | Escalation path |
+| **Primary concern** | What the user receives; what the AI can still do | Who owns the escalation; what happens if no one accepts |
+
+Do not merge these specifications. Both serve distinct functions in the pattern system.
 
 ---
 
