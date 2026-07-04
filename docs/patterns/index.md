@@ -112,13 +112,13 @@ Escalation paths route a request, decision, incident, or exception to a higher a
 > - **Refusal Human Handoff** (`patterns/refusal/human-handoff.md`) — the AI cannot complete the request and routes the user to a person as its refusal strategy. The trigger is the AI's inability to fulfill the request.
 > - **Escalation Human Handoff** (`patterns/escalation/human-handoff.md`) — the system routes a request, decision, incident, or exception to a person because the AI's authority, policy scope, or authorization level is insufficient. The trigger is scope or authorization, not inability.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Human Handoff (escalation) | Human escalation | 🔲 | `patterns/escalation/human-handoff.md` |
-| Role Escalation | Role authority | 🔲 | `patterns/escalation/role-escalation.md` |
-| System Escalation | System authority | 🔲 | `patterns/escalation/system-escalation.md` |
-| Emergency Escalation | Critical risk | 🔲 | `patterns/escalation/emergency-escalation.md` |
-| Async Review Escalation | Non-immediate review | 🔲 | `patterns/escalation/async-review-escalation.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| Human Handoff (escalation) | Human escalation | Caution–Blocking (2–3) | 🟢 | [`patterns/escalation/human-handoff.md`](../../patterns/escalation/human-handoff.md) |
+| Role Escalation | Role authority | Advisory–Blocking (1–3) | 🟢 | [`patterns/escalation/role-escalation.md`](../../patterns/escalation/role-escalation.md) |
+| System Escalation | System authority | Advisory–Blocking (1–3) | 🟢 | [`patterns/escalation/system-escalation.md`](../../patterns/escalation/system-escalation.md) |
+| Emergency Escalation | Critical risk | Critical (4) | 🟢 | [`patterns/escalation/emergency-escalation.md`](../../patterns/escalation/emergency-escalation.md) |
+| Async Review Escalation | Non-immediate review | Informational–Caution (0–2) | 🟢 | [`patterns/escalation/async-review-escalation.md`](../../patterns/escalation/async-review-escalation.md) |
 
 ---
 
