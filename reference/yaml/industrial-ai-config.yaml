@@ -1,0 +1,187 @@
+# Industrial AI Deployment Policy Configuration
+# Industry: Manufacturing — Process monitoring and safety advisory
+# Reference case study: docs/case-studies/industrial-ai.md
+# Validates against: reference/json/guardrail-policy.schema.json
+
+policyId: pol-industrial-ai-v1
+version: 1.0.0
+level: tenant                # Tenant-level — safety rules cannot be overridden by deployment config
+tenantId: example-manufacturing-co
+deploymentId: process-monitoring-ai
+industry: manufacturing
+effectiveDate: 2026-01-01
+
+# Risk thresholds — industrial safety context
+# All process recommendations carry Risk >= 3 by default in safety-critical contexts
+riskThresholds:
+  emergencyEscalationMin: 4       # Safety threshold breach always triggers emergency
+  roleEscalationMin: 3
+  blockingWarningMin: 3
+
+# Confidence thresholds — extremely tight for industrial safety
+# Sensor data must be near-certain before advisory is issued; UR window is very short
+confidenceThresholds:
+  high: 0.95                      # Very high HC threshold for safety process advisories
+  moderate: 0.80
+  low: 0.60
+  unresolvableWindowSeconds: 30   # CE→UR in 30 seconds for safety-critical processes
+                                  # (compared to 300s default for non-safety contexts)
+  staleThresholdDays: 0           # Industrial sensor data is always real-time; any delay = stale
+
+# Permission configuration
+# Industrial AI advisory suspension requires explicit operator reset (see rule iad-rule-05)
+permissionConfig:
+  passiveDismissalEqualsDenial: true
+  delegationExpiryHours: 8        # Shift-length delegation maximum
+  overrideScopePerTransaction: true
+  roleMap:
+    process_operator: 1
+    shift_supervisor: 2
+    plant_manager: 3
+    safety_officer: 3
+    maintenance_engineer: 2
+
+# Policy rules — industrial safety process monitoring
+rules:
+  # Rule 1: CE state on safety-critical process sensors → 30-second UR window
+  # This is enforced by the confidenceThresholds.unresolvableWindowSeconds above,
+  # but the rule also prevents the AI from issuing any advisory during the CE window.
+  - ruleId: iad-rule-01
+    description: >
+      When two or more sensors at a safety-critical process stage produce
+      conflicting readings, suppress all process advisory output immediately.
+      Do not issue a constrained recommendation based on one sensor while
+      the other is unresolved. Log CE state and begin UR transition timer.
+    conditions:
+      P1Min: 4
+      P2States: [conflicting]
+      P6Types: [action-execution, decision-support]
+      customConditions:
+        processType: safety-critical
+    effect: allow
+    activatePattern: conflicting-evidence-state
+    skipPatterns: [constrained-completion, partial-completion, safe-refusal]
+    priority: 1
+    auditLevel: critical
+
+  # Rule 2: UR state on safety-critical sensor conflict → mandatory emergency escalation
+  # Any sensor reading above safety threshold during UR state = emergency notification,
+  # regardless of which sensor reads safe. Conservative by design.
+  - ruleId: iad-rule-02
+    description: >
+      When CE state transitions to UR state at Risk=4 (safety-critical process),
+      immediately issue emergency escalation to shift supervisor and facility safety system.
+      Escalation fires even if one sensor reads safe — the risk of a false negative
+      exceeds the cost of a false positive emergency response.
+    conditions:
+      P1Min: 4
+      P2States: [unresolvable]
+      customConditions:
+        anyReadingAboveThreshold: true
+    effect: require-escalation
+    activatePattern: emergency-escalation
+    priority: 2
+    auditLevel: critical
+
+  # Rule 3: Mandatory abandon-recovery after UR state — no auto-resume
+  - ruleId: iad-rule-03
+    description: >
+      After UR state activates and emergency escalation fires, the AI advisory
+      for the affected process stage must enter abandon-recovery immediately.
+      The AI must NOT resume advisory for this process stage until an operator
+      with Tier 2+ authority explicitly resets advisory mode.
+    conditions:
+      P1Min: 4
+      P2States: [unresolvable]
+    effect: allow
+    activatePattern: abandon-recovery
+    priority: 3
+    auditLevel: critical
+
+  # Rule 4: No AI resume without explicit operator reset
+  - ruleId: iad-rule-04
+    description: >
+      After an emergency escalation and abandon-recovery, the AI advisory system
+      for the affected process stage requires an explicit reset acknowledgment
+      from a Tier 2+ authority (shift supervisor or above) before resuming.
+      Automatic resumption on escalation acknowledgment alone is forbidden.
+    conditions:
+      P1Min: 4
+      customConditions:
+        advisorySuspended: true
+        resetRequested: true
+        resettingAuthorityTier: 2
+    effect: allow
+    activatePattern: high-confidence-state  # Re-entry to normal monitoring
+    priority: 4
+    auditLevel: critical
+
+  # Rule 5: Conservative escalation policy — always treat threshold breach as real
+  # Even if the probable explanation is a sensor fault, the AI must escalate.
+  - ruleId: iad-rule-05
+    description: >
+      When any single sensor reads above the safety threshold (even if a second
+      sensor reads safe), and the divergence is sustained beyond the CE window,
+      treat the threshold breach as real. The AI has no basis to prefer one sensor
+      reading over another without physical inspection evidence.
+    conditions:
+      P1Min: 4
+      customConditions:
+        anyReadingAboveThreshold: true
+        diverganceSustainedSeconds: 30
+    effect: require-escalation
+    activatePattern: emergency-escalation
+    priority: 5
+    auditLevel: critical
+
+# Escalation configuration — immediate response required
+escalationConfig:
+  roleEscalationSlaHours: null      # No SLA for role escalation — immediate
+  asyncReviewSlaDays: null          # No async review for emergency escalation
+  emergencyEscalationTargets:
+    - shift-supervisor-pager        # Primary notification target
+    - facility-safety-system        # Automated safety system notification
+    - on-call-safety-officer        # Secondary notification target
+    - plant-manager-notification    # Tertiary (if supervisor unreachable)
+
+# Audit requirements — industrial safety incident logging
+auditRequirements:
+  retentionDays: 3650              # 10 years for industrial safety records
+  immutable: true
+  soxCompliance: false
+  hipaaCompliance: false
+  requiredPatternAuditFields:
+    emergency-escalation:
+      - patternId
+      - sensorReadings               # Both sensor A and B values
+      - diverganceDurationSeconds
+      - escalationTargetsNotified
+      - notificationTimestamp
+      - acknowledgmentTimestamp
+      - acknowledgedBy
+      - postIncidentDetermination    # Filled in after investigation
+      - timestamp
+    abandon-recovery:
+      - patternId
+      - processStageId
+      - suspensionTimestamp
+      - resumeAuthorizedBy
+      - resumeTimestamp
+      - resumeCondition              # What resolved the suspension
+    conflicting-evidence-state:
+      - patternId
+      - sensorIds
+      - readingA
+      - readingB
+      - safetyThreshold
+      - diverganceDurationSeconds
+      - timestamp
+
+# Accessibility requirements
+# Note: Industrial AI panels require audible alerts in addition to visual components
+accessibilityRequirements:
+  wcagLevel: AA
+  requireReducedMotionSupport: true
+  customRequirements:
+    audibleAlert: true              # Emergency escalation must trigger audible alarm
+    highContrastRequired: true      # Industrial environments require high contrast
