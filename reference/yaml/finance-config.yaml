@@ -1,0 +1,170 @@
+# Financial Services Deployment Policy Configuration
+# Industry: Financial services — Retail Banking, Fraud Detection
+# Reference case study: docs/case-studies/banking-fraud.md
+# Validates against: reference/json/guardrail-policy.schema.json
+
+policyId: pol-banking-fraud-v1
+version: 1.0.0
+level: tenant                # Tenant-level — overrides all deployment-level rules
+tenantId: example-retail-bank
+deploymentId: retail-banking-ai
+industry: financial-services
+effectiveDate: 2026-01-01
+
+# Risk thresholds — financial services default
+riskThresholds:
+  emergencyEscalationMin: 4       # Emergency escalation reserved for fraud/compliance events
+  roleEscalationMin: 3
+  blockingWarningMin: 3
+
+# Confidence thresholds
+# Note: For deterministic policy-rule evaluation, P2 is often bypassed.
+# Policy rules fire regardless of confidence when their conditions match.
+confidenceThresholds:
+  high: 0.90
+  moderate: 0.70
+  low: 0.50
+  unresolvableWindowSeconds: 120  # Fast CE→UR transition for financial monitoring
+  staleThresholdDays: 1           # Financial data older than 1 day is considered stale
+
+# Permission configuration
+permissionConfig:
+  passiveDismissalEqualsDenial: true  # Invariant
+  delegationExpiryHours: 4            # Fraud review delegations are short-lived
+  overrideScopePerTransaction: true
+  roleMap:
+    retail_customer: 1
+    branch_agent: 2
+    fraud_analyst: 2
+    fraud_operations_manager: 3
+    compliance_officer: 3
+
+# Policy rules — financial services / fraud prevention
+# All tenant-level rules. Deployment-level rules cannot override these.
+rules:
+  # Rule 1: Block international wires to new beneficiaries above amount threshold without MFA
+  - ruleId: fin-rule-01
+    description: >
+      AML and fraud prevention: automatically block international wire transfers
+      to new (never-before-used) beneficiaries in high-risk jurisdictions above
+      the configurable amount threshold when MFA is incomplete for the wire type.
+      This is a tenant-level non-negotiable control.
+    conditions:
+      P1Min: 4
+      P4: unauthorized            # MFA not completed = unauthorized for wire execution
+      P6Types: [action-execution]
+      customConditions:
+        beneficiaryType: new
+        destinationType: international
+        mfaComplete: false
+        # amountThreshold: configured per deployment in environment variables
+    effect: block
+    activatePattern: policy-refusal
+    skipPatterns: [safe-refusal, human-handoff]
+    priority: 1
+    auditLevel: critical
+
+  # Rule 2: Block wire initiation from unregistered device without additional verification
+  - ruleId: fin-rule-02
+    description: >
+      Device trust policy: block wire transfer initiation from a device that
+      has not previously been registered for wire transfers.
+    conditions:
+      P1Min: 3
+      P4: unauthorized
+      P6Types: [action-execution]
+      customConditions:
+        actionType: wire-transfer
+        deviceRegistered: false
+    effect: block
+    activatePattern: blocking-warning
+    priority: 2
+    auditLevel: critical
+
+  # Rule 3: Emergency escalation concurrent with fraud policy block
+  - ruleId: fin-rule-03
+    description: >
+      Concurrent with any policy-refusal block on a financial transaction,
+      notify the fraud operations team in interrupt mode. Escalation fires
+      before the customer sees the block — not after.
+    conditions:
+      P1Min: 4
+      P6Types: [action-execution]
+      customConditions:
+        policyBlock: true
+    effect: require-escalation
+    activatePattern: emergency-escalation
+    priority: 3
+    auditLevel: critical
+
+  # Rule 4: Redirect recovery after fraud block
+  - ruleId: fin-rule-04
+    description: >
+      After a fraud policy block, offer redirect-recovery with two paths:
+      complete MFA flow (mandatory before re-initiation) and fraud team contact.
+      Automatic retry is forbidden for blocked transactions.
+    conditions:
+      P1Min: 3
+      P6Types: [action-execution]
+      customConditions:
+        policyBlock: true
+        recoveryNeeded: true
+    effect: allow
+    activatePattern: redirect-recovery
+    skipPatterns: [retry-recovery]
+    priority: 4
+    auditLevel: detailed
+
+  # Rule 5: Limitation disclosure on fraud block — preserve customer trust
+  - ruleId: fin-rule-05
+    description: >
+      The customer-facing policy warning must include a limitation-disclosure
+      stating that the hold is policy-governed, not a judgment of fraud.
+      This preserves customer trust and reduces unnecessary dispute escalations.
+    conditions:
+      P1Min: 3
+      customConditions:
+        policyBlock: true
+        audience: customer
+    effect: audit-only
+    activatePattern: limitation-disclosure
+    priority: 5
+    auditLevel: standard
+
+# Escalation configuration
+escalationConfig:
+  roleEscalationSlaHours: 2        # Fraud review must respond within 2 hours
+  asyncReviewSlaDays: 1            # Fraud queue items expire in 1 day
+  emergencyEscalationTargets:
+    - fraud-operations-team
+    - backup-fraud-team
+    - compliance-officer
+
+# Audit requirements — financial controls
+auditRequirements:
+  retentionDays: 2555              # 7 years for financial transaction records
+  immutable: true
+  soxCompliance: false             # Retail banking — no SOX unless holding company
+  hipaaCompliance: false
+  requiredPatternAuditFields:
+    policy-refusal:
+      - patternId
+      - policyRuleId
+      - primitiveSnapshot
+      - transactionId
+      - transactionAmount
+      - beneficiaryId
+      - deviceId
+      - mfaStatus
+      - timestamp
+    emergency-escalation:
+      - patternId
+      - escalationTargets
+      - notificationTimestamp
+      - acknowledgmentTimestamp
+      - transactionId
+
+# Accessibility requirements
+accessibilityRequirements:
+  wcagLevel: AA
+  requireReducedMotionSupport: true
