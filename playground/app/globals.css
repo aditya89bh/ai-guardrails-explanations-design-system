@@ -957,7 +957,7 @@ button, select, input[type="range"] { font-family: inherit; }
 
 @media (max-width: 768px) {
   :root {
-    --pg-audit-height: 160px;
+    --pg-audit-height: 140px;
     --pg-header-height: 48px;
     --pg-scenarios-height: 44px;
   }
@@ -965,30 +965,149 @@ button, select, input[type="range"] { font-family: inherit; }
   .pg-root {
     grid-template-rows: var(--pg-header-height) var(--pg-scenarios-height) 1fr var(--pg-audit-height);
     height: 100dvh;
+    height: 100svh;
   }
 
   .pg-main {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .pg-panel {
     border-right: none;
     border-bottom: 1px solid var(--pg-border);
-    min-height: 320px;
+    min-height: 280px;
     max-height: 60vh;
   }
 
   .pg-header-subtitle { display: none; }
   .pg-header-badge    { display: none; }
+  .pg-header-stat     { display: none; }
 
-  .pg-scenarios-bar { flex-wrap: nowrap; }
+  .pg-scenarios-bar   { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .pg-scenarios-list  { flex-wrap: nowrap; }
+
+  .pg-scenario-key    { display: none; }
+
+  .pg-welcome { padding: 20px 16px; }
+
+  .pg-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .pg-tab   { flex-shrink: 0; }
 }
 
 @media (max-width: 480px) {
+  :root {
+    --pg-header-height: 44px;
+    --pg-scenarios-height: 40px;
+    --pg-audit-height: 120px;
+  }
+
   .pg-scenarios-label { display: none; }
-  .pg-panel-body { padding: 10px; }
+  .pg-panel-body      { padding: 10px; }
+  .pg-header-title    { font-size: 13px; }
+
+  .pg-icon-btn        { display: none; }
+  .pg-icon-btn:last-of-type { display: block; }
+
+  .pg-welcome-scenarios { max-width: 100%; }
+}
+
+@media (pointer: coarse) {
+  .pg-scenario-btn,
+  .pg-tab,
+  .pg-icon-btn,
+  .pg-welcome-scenario-btn {
+    min-height: 44px;
+  }
+  .pg-tab { padding: 0 14px; }
+}
+
+/* ─── Welcome state ─────────────────────────────────────────────────────── */
+.pg-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  min-height: 240px;
+}
+
+.pg-welcome-icon {
+  font-size: 32px;
+  color: var(--pg-accent);
+  opacity: 0.5;
+  user-select: none;
+}
+
+.pg-welcome-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pg-text);
+  letter-spacing: -0.01em;
+}
+
+.pg-welcome-body {
+  font-size: 13px;
+  color: var(--pg-text-muted);
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+.pg-welcome-scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-width: 260px;
+  margin-top: 4px;
+}
+
+.pg-welcome-scenario-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--pg-surface-hover);
+  border: 1px solid var(--pg-border);
+  border-radius: var(--guardrail-radius-sm);
+  color: var(--pg-text);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pg-welcome-scenario-btn:hover {
+  border-color: var(--pg-accent);
+  background: var(--pg-accent-muted);
+}
+
+.pg-welcome-scenario-btn:focus-visible {
+  outline: 2px solid var(--pg-accent);
+  outline-offset: 1px;
+}
+
+.pg-welcome-scenario-label {
+  flex: 1;
+}
+
+.pg-welcome-scenario-key {
+  font-family: var(--guardrail-font-mono);
+  font-size: 10px;
+  color: var(--pg-text-dim);
+  background: var(--pg-border);
+  border-radius: 2px;
+  padding: 1px 4px;
+}
+
+.pg-welcome-hint {
+  font-size: 11px;
+  color: var(--pg-text-dim);
+  margin-top: 4px;
 }
 
 /* ─── Tabpanel focus ─────────────────────────────────────────────────────── */

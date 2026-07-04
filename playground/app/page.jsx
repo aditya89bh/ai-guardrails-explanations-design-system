@@ -29,6 +29,7 @@ export default function PlaygroundPage() {
   const [darkMode, setDarkMode] = useState(true);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
   const mainRef = useRef(null);
   const engineTabRefs = useRef({});
 
@@ -117,13 +118,14 @@ export default function PlaygroundPage() {
   const handlePrimitiveChange = useCallback((key, value) => {
     setPrimitives(prev => ({ ...prev, [key]: value }));
     setActiveScenario(null);
+    setShowWelcome(false);
   }, []);
 
   const handleScenarioSelect = useCallback((scenarioId) => {
     const scenario = SCENARIOS.find(s => s.id === scenarioId);
     if (!scenario) return;
     setIsLoading(true);
-    // Tiny delay so loading state renders
+    setShowWelcome(false);
     setTimeout(() => {
       setPrimitives(scenario.primitives);
       setActiveScenario(scenarioId);
@@ -144,6 +146,7 @@ export default function PlaygroundPage() {
     setPrimitives(DEFAULT_PRIMITIVES);
     setActiveScenario(null);
     setAuditLog([]);
+    setShowWelcome(true);
   }, []);
 
   const handleAuditEvent = useCallback((event) => {
@@ -372,13 +375,40 @@ export default function PlaygroundPage() {
             </span>
           </div>
           <div className="pg-panel-body">
-            <ErrorBoundary panelName="Result Panel">
-              <ResultPanel
-                result={engineResult}
-                primitives={primitives}
-                onAuditEvent={handleAuditEvent}
-              />
-            </ErrorBoundary>
+            {showWelcome ? (
+              <div className="pg-welcome" role="region" aria-label="Getting started">
+                <div className="pg-welcome-icon" aria-hidden="true">⬡</div>
+                <div className="pg-welcome-title">Guardrail Decision Engine</div>
+                <div className="pg-welcome-body">
+                  Load a scenario to see the engine in action, or adjust the P1–P10 primitives on the left.
+                </div>
+                <div className="pg-welcome-scenarios">
+                  {SCENARIOS.map((s, idx) => (
+                    <button
+                      key={s.id}
+                      className="pg-welcome-scenario-btn"
+                      onClick={() => handleScenarioSelect(s.id)}
+                      aria-label={`Load ${s.label} scenario: ${s.description}`}
+                    >
+                      <span style={{ color: s.color }} aria-hidden="true">◆</span>
+                      <span className="pg-welcome-scenario-label">{s.label}</span>
+                      <span className="pg-welcome-scenario-key" aria-hidden="true">{idx + 1}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="pg-welcome-hint">
+                  Press <kbd>?</kbd> for keyboard shortcuts
+                </div>
+              </div>
+            ) : (
+              <ErrorBoundary panelName="Result Panel">
+                <ResultPanel
+                  result={engineResult}
+                  primitives={primitives}
+                  onAuditEvent={handleAuditEvent}
+                />
+              </ErrorBoundary>
+            )}
           </div>
         </section>
       </main>
