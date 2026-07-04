@@ -8,12 +8,16 @@ import { PrimitiveControls } from '../components/PrimitiveControls.jsx';
 import { EnginePanel } from '../components/EnginePanel.jsx';
 import { ResultPanel } from '../components/ResultPanel.jsx';
 import { AuditPanel } from '../components/AuditPanel.jsx';
+import { PipelineFlow } from '../components/PipelineFlow.jsx';
+import { StateTransitionViz } from '../components/StateTransitionViz.jsx';
+import { CompositionViz } from '../components/CompositionViz.jsx';
 
 export default function PlaygroundPage() {
   const [primitives, setPrimitives] = useState(DEFAULT_PRIMITIVES);
   const [activeScenario, setActiveScenario] = useState(null);
   const [auditLog, setAuditLog] = useState([]);
   const [activeEngineTab, setActiveEngineTab] = useState('rules');
+  const [showPipeline, setShowPipeline] = useState(false);
 
   const engineResult = useMemo(() => evaluate(primitives), [primitives]);
 
@@ -130,9 +134,11 @@ export default function PlaygroundPage() {
           </div>
           <div className="pg-tabs" role="tablist">
             {[
-              { id: 'rules',    label: 'Rules', count: engineResult.rules.length },
-              { id: 'patterns', label: 'Patterns', count: engineResult.patterns.length },
-              { id: 'compose',  label: 'Composition', count: engineResult.composition.appliedConstraints.length },
+              { id: 'rules',      label: 'Rules',       count: engineResult.rules.length },
+              { id: 'patterns',   label: 'Patterns',    count: engineResult.patterns.length },
+              { id: 'compose',    label: 'Composition', count: engineResult.composition.appliedConstraints.length },
+              { id: 'state-machine', label: 'States',   count: null },
+              { id: 'composition-viz', label: 'Flow',   count: null },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -152,7 +158,19 @@ export default function PlaygroundPage() {
             ))}
           </div>
           <div className="pg-panel-body" id={`engine-tab-${activeEngineTab}`} role="tabpanel">
-            <EnginePanel result={engineResult} activeTab={activeEngineTab} />
+            {(activeEngineTab === 'rules' || activeEngineTab === 'patterns' || activeEngineTab === 'compose') && (
+              <EnginePanel result={engineResult} activeTab={activeEngineTab} />
+            )}
+            {activeEngineTab === 'state-machine' && (
+              <StateTransitionViz currentState={primitives.P2} />
+            )}
+            {activeEngineTab === 'composition-viz' && (
+              <>
+                <PipelineFlow result={engineResult} />
+                <div className="pg-divider" />
+                <CompositionViz result={engineResult} />
+              </>
+            )}
           </div>
         </section>
 
