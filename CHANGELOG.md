@@ -12,6 +12,58 @@ Work in progress across active phases.
 
 ---
 
+## Phase 4 — AI Component Library
+
+**Status:** Complete
+**Commits:** 21
+**Goal:** Transform the pattern specifications and decision engine into an implementable, framework-agnostic UI component library covering all 36 guardrail patterns across 7 categories.
+
+### Added
+
+**Shared library documents:**
+- `components/design-tokens.md` — Complete design token specification: severity color tokens (surface, text, icon, border at 5 severity levels), priority z-index tokens (6 tiers from inline to escalation), elevation tokens (0–4), spacing tokens (xs–3xl with 44×44px touch target rule), icon semantic tokens (19 named icons), animation duration tokens (instant–600ms) with reduced-motion fallbacks, easing tokens (5 curves), border treatment tokens, focus indicator tokens (with WCAG 3:1 requirement), disabled state tokens, and audit indicator tokens. Defines the four token usage rules.
+- `components/component-matrix.md` — Complete mapping of all 36 guardrail patterns to their implementing component(s). Each entry specifies: component name, key input props, key output callbacks, states, accessibility requirement, motion, responsive behavior, and decision engine rule reference. Organized by all 7 pattern categories (Warning, Explanation, Permission, Uncertainty, Refusal, Escalation, Recovery).
+- `components/implementation-guidelines.md` — Framework implementation guidance for React (state management, focus management, audit callbacks, token consumption), Vue (defineProps/defineEmits, nextTick focus, v-model), Web Components (shadow DOM, custom events, aria labeling), iOS (SwiftUI/UIKit — color assets, UIAlertController, isReduceMotionEnabled), Android (Compose — Material Theme, Dialog, ANIMATOR_DURATION_SCALE), enterprise dashboards (compact density, data table integration, print/export), dark mode (dual-mode token system), i18n (string length considerations, flexible-width buttons, locale-aware date formatting), and RTL (CSS logical properties, directional rules, icon flip guidance).
+- `components/accessibility-checklist.md` — WCAG 2.1 AA compliance checklist organized by success criterion (perceivability, operability, understandability, robustness) with component-specific items for warning, permission, emergency escalation, and override recovery. Includes automated testing tool guidance and manual testing requirements (NVDA, JAWS, VoiceOver).
+
+**Per-category component documents (7 categories × 6 files = 42 documents):**
+
+- `components/warning/` — InlineWarning, WarningBanner, ModalWarning, BlockingWarning, PolicyWarning. Specifies 6 variants, progressive warning escalation rules, severity-to-elevation independence rule. Interaction: auto-dismiss timer, pointer-event blocking for blocking overlay. Accessibility: `role="alertdialog"` for modal/blocking, `aria-live` politeness selection by severity. Motion: severity-matched entrance durations (100ms–600ms). Responsive: full-screen modal on xs/sm.
+
+- `components/explanation/` — ConfidenceBadge, SourceList, ReasoningTrace, DecisionSummary, LimitationDisclosure, StructuredUncertaintyCard. All passive by default with optional interaction. Accessibility: tooltip as `role="tooltip"`, expand controls with `aria-expanded`. Motion: always subtle — never intrusive. Responsive: tooltip → bottom sheet on xs/sm.
+
+- `components/permission/` — PermissionGate, ScopedPermissionGate, DelegatedPermissionRequest, PermissionRevocationNotice. Specifies passive dismissal = denial as security invariant. Deny-first tab order. Focus trap. Audit callbacks required. Motion: scope item stagger animation. Responsive: bottom sheet on xs/sm.
+
+- `components/uncertainty/` — UncertaintyIndicator, ConflictingEvidenceCard, StaleContextBadge, UnresolvableStateCard. High-confidence state requires no component. State transitions reflected immediately. UnresolvableStateCard uses `role="alert"` with assertive live region. Motion: one-shot pulse permitted (not looping). Responsive: 2-col evidence → single col on xs.
+
+- `components/refusal/` — RefusalCard, PartialCompletionCard, ConstrainedCompletionCard, AlternativeSuggestionCard, ClarificationRequest, HumanHandoffCard. "None of these" required on all alternative lists. Focus moves to first path-forward action on mount. Exclusion notice never collapsed by default. Motion: partial completion reveals staggered.
+
+- `components/escalation/` — HumanHandoffPanel, RoleEscalationCard, SystemEscalationNotice, EmergencyEscalationOverlay, AsyncReviewStatus. EmergencyEscalationOverlay: full keyboard capture, Escape disabled, requires explicit acknowledgment, aggressive entrance motion. Non-emergency components non-blocking. Responsive: AsyncReviewStatus as bottom status bar on xs/sm.
+
+- `components/recovery/` — RetryPrompt, RedirectSuggestion, RepairCard, OverrideConfirmation, AbandonExit. Focus moves to primary action immediately. Override: checkbox gates confirm button (aria-disabled). Abandon: saved/not-saved lists staggered. Cascade transition announces "Let me try something different." Responsive: OverrideConfirmation as bottom sheet on xs/sm.
+
+### Changed
+
+- `components/README.md` — Updated to reflect Phase 4 completion (existing scaffold preserved; Phase 4 status line added).
+- `README.md` — Phase 4 added as complete; roadmap description updated.
+- `docs/index.md` — Component Library section added to status table; engineer navigation updated.
+
+### Design Decisions
+
+- **Six-file structure per category (README + component-spec + interaction-model + accessibility + motion + responsive):** This structure separates concerns clearly — what a component is, how users interact with it, how it's accessible, how it moves, and how it adapts. Each file can be read independently by the relevant specialist (developer, a11y lead, motion designer, mobile engineer).
+- **Component matrix as integration test input:** The component matrix is structured so each row can become an automated test case: given a pattern, verify the component has the correct ARIA role, state count, and decision engine rule reference.
+- **Design tokens as the single truth:** All color, spacing, elevation, and animation values are defined as named tokens. No component hardcodes a value. This makes theme switching, dark mode, and deployment-level customization tractable.
+- **Emergency escalation keyboard capture is non-configurable:** The full Tab-capture behavior of EmergencyEscalationOverlay is specified as invariant. Enterprise deployments may customize visual styling but not the acknowledgment requirement — this is a safety behavior.
+- **Deny-first tab order in permission gates:** The tab order in all permission gates places the deny control before the grant control. This is a deliberate security UX choice — keyboard users who Tab without reading encounter the denial path first.
+
+### Known Gaps
+
+- Per-category `README.md` files are intentionally brief overviews (5–15 lines). They do not duplicate the content of `component-spec.md`.
+- `components/README.md` (root) was not fully rewritten — it retains the Phase 1 scaffold. A full rewrite is planned alongside the component matrix in a Phase 4 cleanup pass.
+- Example implementation code (React, Vue, Web Component) is not included in Phase 4 — `examples/` is targeted for Phase 7.
+
+---
+
 ## Phase 3 — Guardrail Decision Engine
 
 **Status:** Complete
