@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://guardrails.design/schemas/guardrail-policy.schema.json",
+  "title": "GuardrailPolicy",
+  "description": "Schema for a guardrail deployment policy document. Encodes the P5 policy configuration for a specific tenant or deployment. Validates against the policy primitive defined in docs/decision-flows/decision-primitives.md.",
+  "type": "object",
+  "required": ["policyId", "version", "level", "effectiveDate", "rules"],
+  "properties": {
+    "policyId": {
+      "type": "string",
+      "description": "Unique identifier for this policy document. Used in audit logs and rule attribution."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this policy."
+    },
+    "level": {
+      "type": "string",
+      "enum": ["tenant", "deployment"],
+      "description": "Authority level. Tenant-level rules override deployment-level rules when both match."
+    },
+    "tenantId": {
+      "type": "string",
+      "description": "Required for deployment-level policies. Identifies the tenant this deployment belongs to."
+    },
+    "deploymentId": {
+      "type": "string",
+      "description": "Unique identifier for the specific AI system deployment this policy governs."
+    },
+    "industry": {
+      "type": "string",
+      "enum": [
+        "healthcare",
+        "financial-services",
+        "insurance",
+        "human-resources",
+        "customer-support",
+        "developer-tools",
+        "manufacturing",
+        "procurement",
+        "legal",
+        "government",
+        "general"
+      ],
+      "description": "Industry classification. Used to select appropriate default thresholds."
+    },
+    "effectiveDate": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date on which this policy version takes effect."
+    },
+    "expiryDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Optional ISO 8601 date on which this policy version expires."
+    },
+    "riskThresholds": {
+      "type": "object",
+      "description": "P1 risk value overrides for this deployment context.",
+      "properties": {
+        "emergencyEscalationMin": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "default": 4,
+          "description": "Minimum P1 risk value that triggers emergency escalation."
+        },
+        "roleEscalationMin": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "default": 3,
+          "description": "Minimum P1 risk value that triggers role escalation (when other conditions met)."
+        },
+        "blockingWarningMin": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4,
+          "default": 3,
+          "description": "Minimum P1 risk value for blocking-warning pattern activation."
+        }
+      },
+      "additionalProperties": false
+    },
+    "confidenceThresholds": {
+      "type": "object",
+      "description": "P2 confidence score boundaries for this deployment. Overrides global defaults.",
+      "properties": {
+        "high": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum score for High confidence classification."
+        },
+        "moderate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum score for Moderate confidence classification."
+        },
+        "low": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum score for Low confidence (below this = Insufficient)."
+        },
+        "unresolvableWindowSeconds": {
+          "type": "integer",
+          "minimum": 10,
+          "description": "Seconds a conflicting-evidence-state persists before transitioning to unresolvable-state."
+        }
+      }
+    },
+    "permissionConfig": {
+      "type": "object",
+      "description": "P4 permission model configuration.",
+      "properties": {
+        "passiveDismissalEqualsDenial": {
+          "type": "boolean",
+          "default": true,
+          "description": "Cannot be set to false. Passive dismissal always equals denial for consequential actions."
+        },
+        "delegationExpiryHours": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Hours before a delegated-permission grant expires."
+        },
+        "overrideScopePerTransaction": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, manual override authorizations apply to exactly one transaction."
+        },
+        "roleMap": {
+          "type": "object",
+          "description": "Maps role identifiers to authority tiers.",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered list of policy rules. Rules are evaluated in order. 'tenant' level rules are always evaluated before 'deployment' level rules.",
+      "items": {
+        "$ref": "#/$defs/PolicyRule"
+      }
+    },
+    "escalationConfig": {
+      "type": "object",
+      "description": "Escalation path configuration for this deployment.",
+      "properties": {
+        "roleEscalationSlaHours": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Hours before a role escalation request times out and promotes to async review."
+        },
+        "asyncReviewSlaDays": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Days before an async review escalation request times out."
+        },
+        "emergencyEscalationTargets": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Notification target identifiers (role, team, or system) for emergency escalation."
+        }
+      }
+    },
+    "auditRequirements": {
+      "type": "object",
+      "description": "Audit logging requirements for this deployment.",
+      "properties": {
+        "retentionDays": {"type": "integer", "minimum": 1},
+        "immutable": {"type": "boolean", "default": true},
+        "requiredPatternAuditFields": {
+          "type": "object",
+          "description": "Additional required audit fields per pattern ID beyond the global defaults.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        },
+        "soxCompliance": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, audit records include SOX-specific fields and are flagged for financial controls review."
+        },
+        "hipaaCompliance": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, audit records are subject to HIPAA minimum necessary standard for PHI access logging."
+        }
+      }
+    },
+    "accessibilityRequirements": {
+      "type": "object",
+      "description": "Accessibility configuration overrides for this deployment.",
+      "properties": {
+        "wcagLevel": {
+          "type": "string",
+          "enum": ["A", "AA", "AAA"],
+          "default": "AA",
+          "description": "Minimum WCAG compliance level. Cannot be set below AA for regulated industry deployments."
+        },
+        "requireReducedMotionSupport": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "PolicyRule": {
+      "type": "object",
+      "required": ["ruleId", "description", "conditions", "effect", "activatePattern"],
+      "properties": {
+        "ruleId": {
+          "type": "string",
+          "description": "Unique identifier for this rule. Referenced in audit logs."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable description of what this rule enforces."
+        },
+        "conditions": {
+          "type": "object",
+          "description": "Conditions that must all be true (AND logic) for this rule to match.",
+          "properties": {
+            "P1Min": {"type": "integer", "minimum": 0, "maximum": 4},
+            "P2States": {"type": "array", "items": {"type": "string"}},
+            "P3": {"type": "string"},
+            "P4": {"type": "string"},
+            "P6Types": {"type": "array", "items": {"type": "string"}},
+            "P8Min": {"type": "integer", "minimum": 1, "maximum": 3},
+            "customConditions": {
+              "type": "object",
+              "description": "Deployment-specific conditions not expressible via standard primitives.",
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "effect": {
+          "type": "string",
+          "enum": ["block", "require-permission", "require-escalation", "allow", "audit-only"],
+          "description": "Action taken when this rule matches."
+        },
+        "activatePattern": {
+          "type": "string",
+          "description": "Pattern ID to activate when this rule matches. Must reference a pattern in patterns.schema.json."
+        },
+        "skipPatterns": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Pattern IDs suppressed when this rule matches."
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Rule evaluation priority within the same level. Lower = higher priority."
+        },
+        "auditLevel": {
+          "type": "string",
+          "enum": ["standard", "detailed", "critical"],
+          "default": "standard",
+          "description": "Audit detail level for events generated by this rule."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "policyId": "pol-banking-fraud-v1",
+      "version": "1.0.0",
+      "level": "tenant",
+      "tenantId": "acme-bank",
+      "deploymentId": "retail-banking-ai",
+      "industry": "financial-services",
+      "effectiveDate": "2026-01-01",
+      "riskThresholds": {
+        "emergencyEscalationMin": 4,
+        "roleEscalationMin": 3,
+        "blockingWarningMin": 3
+      },
+      "confidenceThresholds": {
+        "high": 0.90,
+        "moderate": 0.70,
+        "low": 0.50,
+        "unresolvableWindowSeconds": 120
+      },
+      "rules": [
+        {
+          "ruleId": "fraud-rule-01",
+          "description": "Block international wires to new beneficiaries above threshold without completed MFA",
+          "conditions": {
+            "P1Min": 4,
+            "P4": "unauthorized",
+            "P6Types": ["action-execution"],
+            "customConditions": {
+              "beneficiaryType": "new",
+              "destinationType": "international",
+              "mfaComplete": false
+            }
+          },
+          "effect": "block",
+          "activatePattern": "policy-refusal",
+          "skipPatterns": ["safe-refusal"],
+          "priority": 1,
+          "auditLevel": "critical"
+        }
+      ],
+      "escalationConfig": {
+        "roleEscalationSlaHours": 4,
+        "asyncReviewSlaDays": 2,
+        "emergencyEscalationTargets": ["fraud-ops-team", "compliance-officer"]
+      },
+      "auditRequirements": {
+        "retentionDays": 2555,
+        "immutable": true,
+        "soxCompliance": false,
+        "hipaaCompliance": false
+      }
+    }
+  ]
+}
