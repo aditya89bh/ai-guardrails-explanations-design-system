@@ -24,6 +24,7 @@ export function PermissionGate({ variant = 'scoped', authority = 1, onAuditEvent
   return (
     <div
       role="alertdialog"
+      aria-modal="true"
       aria-labelledby="pg-perm-title"
       aria-describedby="pg-perm-desc"
       style={{
