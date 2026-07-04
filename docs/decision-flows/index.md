@@ -16,10 +16,53 @@ Pattern specifications describe *what* each pattern is and *how* it communicates
 
 ---
 
-## Decision Flow Categories
+## Phase 3 — Decision Engine Documents
+
+The following six documents constitute the complete guardrail decision engine. They are intended to be read in the order listed — each document builds on the layer beneath it.
+
+| Document | Status | Description |
+|---|---|---|
+| [`decision-primitives.md`](decision-primitives.md) | ✅ Stable | Ten foundational input variables: Risk, Confidence, Capability, Permission, Policy, User Intent, Business Impact, User Authority, Context Freshness, Source Reliability |
+| [`pattern-selection-engine.md`](pattern-selection-engine.md) | ✅ Stable | Three-step selection process: category gating, within-category pattern selection, depth and severity calibration |
+| [`pattern-precedence-engine.md`](pattern-precedence-engine.md) | ✅ Stable | Inter-category and intra-category precedence order; conflict resolution rules; suppression rules |
+| [`state-transition-engine.md`](state-transition-engine.md) | ✅ Stable | State machines for Uncertainty States, Refusal States, Escalation Paths, and Recovery Flows; cross-machine transition matrix |
+| [`pattern-composition-engine.md`](pattern-composition-engine.md) | ✅ Stable | Legal and illegal pattern combinations; composition sequence rules; standard composition templates |
+| [`orchestration-engine.md`](orchestration-engine.md) | ✅ Stable | Complete end-to-end orchestration examples: Healthcare, Finance, Enterprise Assistant, Developer Copilot, Industrial AI |
+
+---
+
+## Decision Engine Architecture
+
+```
+Interaction input
+       ↓
+Decision Primitives (P1–P10)
+  [Risk, Confidence, Capability, Permission, Policy,
+   User Intent, Business Impact, User Authority,
+   Context Freshness, Source Reliability]
+       ↓
+Pattern Selection Engine
+  [Category gating → pattern selection → depth calibration]
+       ↓
+Pattern Precedence Engine
+  [Inter-category order → conflict resolution → suppression]
+       ↓
+Pattern Composition Engine
+  [Legal sequences → illegal combinations → cardinality limits]
+       ↓
+State Transition Engine
+  [Uncertainty / Refusal / Escalation / Recovery state machines]
+       ↓
+Final interaction delivered to user
+```
+
+---
+
+## Planned Decision Flow Documents (Phase 4+)
+
+The following granular per-category flow documents remain planned for future phases. Phase 3 addresses the full decision engine at the system level; Phase 4 will produce per-category implementation flows that map directly to each of the 36 pattern specifications.
 
 ### Warning Pattern Flows
-Logic for determining when to warn, at what severity, and with which variant.
 
 | Flow | Status | File |
 |---|---|---|
@@ -28,7 +71,6 @@ Logic for determining when to warn, at what severity, and with which variant.
 | Warning escalation threshold | 🔲 Planned | `docs/decision-flows/warning/escalation-threshold.md` |
 
 ### Explanation Pattern Flows
-Logic for determining which explanation to surface, at what depth, and to whom.
 
 | Flow | Status | File |
 |---|---|---|
@@ -37,7 +79,6 @@ Logic for determining which explanation to surface, at what depth, and to whom.
 | Source citation trigger logic | 🔲 Planned | `docs/decision-flows/explanation/source-citation-trigger.md` |
 
 ### Permission Gate Flows
-Logic for determining which gate type is required and when gate output is logged.
 
 | Flow | Status | File |
 |---|---|---|
@@ -46,7 +87,6 @@ Logic for determining which gate type is required and when gate output is logged
 | Delegation routing | 🔲 Planned | `docs/decision-flows/permission/delegation-routing.md` |
 
 ### Uncertainty State Flows
-Logic for classifying uncertainty and selecting the appropriate disclosure treatment.
 
 | Flow | Status | File |
 |---|---|---|
@@ -54,7 +94,6 @@ Logic for classifying uncertainty and selecting the appropriate disclosure treat
 | Uncertainty-to-refusal escalation | 🔲 Planned | `docs/decision-flows/uncertainty/uncertainty-to-refusal.md` |
 
 ### Refusal State Flows
-Logic for selecting refusal type, determining disclosure level, and connecting to recovery.
 
 | Flow | Status | File |
 |---|---|---|
@@ -63,7 +102,6 @@ Logic for selecting refusal type, determining disclosure level, and connecting t
 | Refusal-to-escalation routing | 🔲 Planned | `docs/decision-flows/refusal/refusal-to-escalation.md` |
 
 ### Escalation Path Flows
-Logic for determining escalation target, urgency, and communication requirements.
 
 | Flow | Status | File |
 |---|---|---|
@@ -72,7 +110,6 @@ Logic for determining escalation target, urgency, and communication requirements
 | Escalation communication requirements | 🔲 Planned | `docs/decision-flows/escalation/communication-requirements.md` |
 
 ### Recovery Flow Flows
-Logic for determining which recovery type is appropriate and how state is preserved.
 
 | Flow | Status | File |
 |---|---|---|
@@ -81,62 +118,19 @@ Logic for determining which recovery type is appropriate and how state is preser
 
 ---
 
-## Cross-Pattern Composition Flows
-
-These flows handle situations where multiple patterns activate simultaneously or in sequence.
-
-| Flow | Status | File |
-|---|---|---|
-| Uncertainty → refusal escalation | 🔲 Planned | `docs/decision-flows/composition/uncertainty-to-refusal.md` |
-| Refusal → escalation → recovery | 🔲 Planned | `docs/decision-flows/composition/refusal-escalation-recovery.md` |
-| Permission gate → audit → recovery | 🔲 Planned | `docs/decision-flows/composition/gate-audit-recovery.md` |
-| Warning → permission gate → refusal | 🔲 Planned | `docs/decision-flows/composition/warning-gate-refusal.md` |
-| Simultaneous pattern priority | 🔲 Planned | `docs/decision-flows/composition/simultaneous-priority.md` |
-
----
-
-## Flow Representation Format
-
-Decision flows in this system are represented in three complementary formats:
-
-### 1. Prose logic
-Plain-language description of the decision: "If X and Y, then Z. If Z and A, then B."
-
-### 2. Decision table
-A tabular representation where rows are condition combinations and columns are outcomes.
-
-```
-| Condition A | Condition B | Condition C | → Outcome |
-|-------------|-------------|-------------|-----------|
-| True        | True        | Any         | Pattern X |
-| True        | False       | True        | Pattern Y |
-| False       | Any         | Any         | Pattern Z |
-```
-
-### 3. Flowchart (Mermaid)
-A visual flowchart for complex branching logic, authored in Mermaid syntax for inline rendering.
-
-```mermaid
-flowchart TD
-    A[Input received] --> B{Policy match?}
-    B -- Yes --> C[Policy Refusal]
-    B -- No --> D{Confidence threshold?}
-    D -- Below threshold --> E[Uncertainty State]
-    D -- Above threshold --> F[Proceed]
-```
-
----
-
 ## Phase Status
 
-- **Phase 1:** Index scaffold only (this file)
-- **Phase 3:** Full decision flows for all pattern categories
-- **Phase 3:** Cross-pattern composition flows
+- **Phase 1:** Index scaffold (this file)
+- **Phase 3 (complete):** Full decision engine — six documents covering primitives, selection, precedence, state machines, composition, and orchestration
+- **Phase 4 (planned):** Granular per-category decision flow documents for each of the 36 pattern specifications
 
-_Total planned decision flow documents: ~20_
+_Total Phase 3 decision engine documents: 6 (stable)_
+_Total planned granular flow documents: ~20 (Phase 4)_
 
 ---
 
 ## Relationship to Pattern Specifications
 
 Every pattern specification in [`docs/patterns/`](../patterns/index.md) references the decision flows that govern it. Decision flows are the authoritative source for trigger logic. Pattern specifications describe what the pattern does; decision flows specify when it fires.
+
+The Phase 3 decision engine is the operative specification for how the 36 pattern specifications interact as a system. Implementations of this design system should treat the decision engine documents as integration test specifications: if a system produces a different output for the same inputs, the implementation diverges from the specification.
