@@ -12,6 +12,105 @@ Work in progress across active phases.
 
 ---
 
+## Phase 8 — Production Hardening & Open Source Release
+
+**Status:** Complete
+**Commits:** 30
+**Goal:** Prepare the repository for production-quality open-source release. Improve usability, discoverability, documentation quality, developer experience, CI, accessibility, and release readiness. No new guardrail concepts introduced. No changes to the decision engine logic. No expansion of the pattern library.
+
+### Added
+
+**New Documentation (`docs/`)**
+- `docs/getting-started.md` — Role-based quickstart for 5 reader types: implement, understand, adopt, validate, contribute. Includes playground 60-second setup, 3 foundational concepts, 7 key files to bookmark, and 4 common mistakes with fixes.
+- `docs/architecture.md` — System overview with 6-layer stack diagram (ASCII), 4 decision engine sublayers, complete data flow, deployment architecture, machine-readable artifacts reference table, and 7 non-negotiable design constraints.
+- `docs/glossary.md` — ~80 canonical definitions across: 10 decision primitives, 7 confidence states, 7 pattern categories, 5 severity levels, 36 patterns (alphabetical), engine terms, and implementation terms.
+- `docs/faq.md` — 25+ questions and answers across: general, decision engine, patterns, components, implementation, and contributing sections.
+- `docs/troubleshooting.md` — 15 common issues with cause and fix: engine issues (safe-refusal vs constrained-completion, policy-refusal, empty output, multiple warnings, emergency escalation), component issues (passive dismissal, ARIA, focus management, auto-grant, reasoning-trace), playground issues (startup, empty state, scenario loading), schema validation, and audit issues.
+- `docs/navigation.md` — Complete file-level map of all 80+ files across every directory. Includes quick-lookup table for common tasks.
+- `docs/project-structure.md` — Naming conventions, directory principles, layering rules, 6 "what goes where" entries, and checklist for adding new files.
+
+**Architecture Diagrams (`docs/diagrams/`)**
+- `docs/diagrams/architecture.md` — 4 Mermaid diagrams: system layers, deployment architecture, reference implementation architecture, and single-request sequence diagram.
+- `docs/diagrams/decision-engine.md` — 4 Mermaid diagrams: engine overview with 14 rules, key selection rule conditions (R01/R04/R07/R08), default precedence order, and composition constraint visualization.
+- `docs/diagrams/pattern-lifecycle.md` — 4 Mermaid diagrams: overall lifecycle, warning pattern lifecycle, refusal selection tree, and audit record structure.
+- `docs/diagrams/state-transitions.md` — 4 Mermaid stateDiagram-v2 diagrams: P2 confidence state machine, pattern selection by P2×Risk, permission gate state machine, and escalation state machine.
+
+**Project Health Files**
+- `SECURITY.md` — In-scope/out-of-scope definitions, vulnerability reporting via GitHub Security Advisories, security considerations for implementers (passive dismissal, audit immutability, auto-grant prohibition, tenantId isolation, dependency security), 48-hour acknowledgment SLA.
+- `SUPPORT.md` — Documentation quick links, GitHub Issues, GitHub Discussions, response expectation table, out-of-scope list.
+- `CODE_OF_CONDUCT.md` — Expected/unacceptable behavior, enforcement mechanism, Contributor Covenant attribution.
+- `ROADMAP.md` — Current state summary, 4 planned phases (Enterprise Playbooks, Regulated Industries, Extended Templates, Review/Release), explicit out-of-scope list, contribution pathway.
+
+**GitHub Files (`.github/`)**
+- `.github/ISSUE_TEMPLATE/bug_report.md` — Bug report template with 8-category location selector, reproduction steps, environment fields.
+- `.github/ISSUE_TEMPLATE/feature_request.md` — Feature request template with 8-type selector, use-case description, contributing guide acknowledgment.
+- `.github/PULL_REQUEST_TEMPLATE.md` — 7-type change selector, 4-section checklist (all contributions + pattern/component/playground/schema-specific), canonical terminology reminder.
+
+**CI Workflows (`.github/workflows/`)**
+- `markdown-lint.yml` — markdownlint-cli on all `.md` files. Relaxed rules: MD013 (line length), MD033 (inline HTML), MD041 (first heading). Triggers on push/PR to main when `.md` files change.
+- `link-check.yml` — markdown-link-check on all `.md` files. Ignores `your-org` placeholder URLs and `localhost`. Weekly schedule (Monday 09:00 UTC). Retry-on-429 enabled.
+- `playground-build.yml` — `npm ci` + `npm run build` in `playground/`. Verifies `.next` build output exists. Verifies all 5 engine module files and 2 data files are present. Triggers on push/PR to `playground/**`.
+- `schema-validation.yml` — JSON syntax validation for all 4 schemas and all 4 example payloads using Python `json.tool`. Reports schema/payload counts. Triggers on push/PR to `reference/json/**` and `reference/examples/**`.
+
+**Playground Components**
+- `playground/components/ErrorBoundary.jsx` — React class component with `getDerivedStateFromError`, per-panel isolation (wraps PrimitiveControls, EnginePanel, ResultPanel), retry button, dev-only console.error, and engine-level null check with reload fallback.
+
+### Improved
+
+**README.md**
+- Added shields.io badges (License, Phase, Patterns, Playground).
+- Rewrote intro as a concise "what this is" with 5 bullets.
+- Added 60-second Quick Start section with bash commands.
+- Added role-based navigation table (designer/PM, engineer, architect, compliance, contributor, browser).
+- Updated pattern categories table with per-category count and when-to-use.
+- Added decision engine overview with ASCII pipeline diagram.
+- Added interactive playground overview with 5-panel descriptions.
+- Updated repository structure with all new Phase 8 files.
+- Added implementation path (6-step sequence).
+- Added industry support table with config and case study links.
+- Updated phase status table to mark Phase 8 complete.
+
+**CONTRIBUTING.md**
+- Added quick links header (glossary, getting-started, SUPPORT, CODE_OF_CONDUCT).
+- Added playground contribution rules (no new concepts, build verification, scenario stability).
+- Added schema contribution rules (no field removal, documentation requirements, payload validation).
+- Added first contribution suggestions (broken links, antipatterns, glossary entries, typos).
+
+**Playground (`playground/`)**
+- `page.jsx` — Keyboard shortcuts: 1–5 load scenarios, [ and ] cycle engine tabs, D toggles theme, R resets, ? shows keyboard help. Keyboard shortcut overlay (dialog with kbd elements, Escape to close). Loading state overlay (animated bar, main panel dim). Dark/light mode toggle button in header with aria-label. Scenario key number indicators. Named `ENGINE_TABS` constant for DRY tab management. ErrorBoundary wrapping for all 3 panels. Engine-level null check. Header stat as live region. Tabpanel with `tabIndex=0` for keyboard reachability. Improved aria-labels on all interactive elements.
+- `globals.css` — Light mode token set (`[data-theme="light"]`). Dark mode default (`[data-theme="dark"]`). Keyboard overlay styles (`.pg-kbd-overlay`, `.pg-kbd-panel`, `kbd`). Loading bar animation. Scenario key indicator. Tab count badge. Audit clear button. Error boundary styles (`.pg-error-boundary`, retry button). Icon button (`.pg-icon-btn`). Tabpanel focus visible style. Loading dim animation on `[data-loading="true"] .pg-main`. High contrast mode additions.
+
+### Validation Results (Phase 8)
+
+- **Terminology scan:** CLEAN — no non-canonical terms detected in any markdown file
+- **Attribution scan:** CLEAN — no co-author lines, no AI attribution
+- **Citation scan:** CLEAN — no unverified external references
+- **JSON schema validation:** CLEAN — 4/4 schemas valid JSON
+- **Example payload validation:** CLEAN — 4/4 payloads valid JSON
+- **Playground file check:** CLEAN — 5 engine modules, 2 data files, 14 components all present
+- **Markdown file count:** 151 files across all directories
+- **Pattern specification count:** 43 files in `patterns/`
+- **Root health files:** 7 present (README, CHANGELOG, CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT, ROADMAP)
+
+### Design Decisions (Phase 8)
+
+**Keyboard shortcuts use non-modifier keys**
+The shortcuts (1–5, [, ], D, R, ?) are intercepted only when focus is not in an input, select, or textarea. This avoids conflicting with form field use while keeping the shortcuts accessible to keyboard users browsing the panels.
+
+**Dark mode uses `data-theme` attribute on `<html>`**
+Setting `data-theme` on the root element allows CSS selectors anywhere in the component tree to respond to theme changes without passing theme state through props. This is the correct pattern for application-wide theming in React without a context provider.
+
+**Error boundaries are per-panel, not per-application**
+Wrapping each panel individually means one panel's error does not affect the others. A user can continue viewing the audit trail and result panel if the primitive controls fail, and retry the failing panel independently.
+
+**CI workflows use `--prefer-offline` / `npm ci`**
+`npm ci` ensures reproducible installs from the lockfile. `--prefer-offline` reduces build time in environments where the cache is warm.
+
+**Mermaid diagrams live in `docs/diagrams/`**
+Diagrams are kept separate from narrative documentation so they can be updated independently. GitHub renders Mermaid fences natively in markdown files, making them zero-dependency.
+
+---
+
 ## Phase 7 — Interactive Playground & Validation
 
 **Status:** Complete
