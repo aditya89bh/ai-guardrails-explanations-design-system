@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://guardrails.design/schemas/component.schema.json",
+  "title": "GuardrailComponent",
+  "description": "Schema for a guardrail UI component configuration object. Components implement guardrail patterns as specified in components/. Design token names follow components/design-tokens.md.",
+  "type": "object",
+  "required": ["id", "patternId", "displayName", "variants", "accessibilityRole"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][a-zA-Z]+$",
+      "description": "PascalCase component identifier. Must match the component name in components/*/component-spec.md.",
+      "examples": [
+        "WarningBanner",
+        "BlockingWarning",
+        "PolicyWarning",
+        "ModalWarning",
+        "EmergencyEscalationOverlay",
+        "ConfidenceBadge",
+        "LimitationDisclosure",
+        "SourceList",
+        "ReasoningTrace",
+        "ScopedPermissionGate",
+        "DelegatedPermissionRequest",
+        "UncertaintyIndicator",
+        "ConflictingEvidenceCard",
+        "UnresolvableStateCard",
+        "StaleContextBadge",
+        "RefusalCard",
+        "PartialCompletionCard",
+        "ConstrainedCompletionCard",
+        "AlternativeSuggestionCard",
+        "ClarificationRequest",
+        "HumanHandoffCard",
+        "RoleEscalationCard",
+        "AsyncReviewStatus",
+        "RetryPrompt",
+        "RedirectSuggestion",
+        "RepairCard",
+        "OverrideConfirmation",
+        "AbandonExit"
+      ]
+    },
+    "patternId": {
+      "type": "string",
+      "description": "Pattern ID this component implements. Must match a pattern ID in patterns.schema.json."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Human-readable component name for documentation and debugging."
+    },
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Named variants this component supports.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "severity": {
+            "type": "string",
+            "enum": ["informational", "advisory", "caution", "blocking", "critical"]
+          }
+        }
+      }
+    },
+    "props": {
+      "type": "object",
+      "description": "Component props definition. Each key is a prop name; value describes its type and semantics.",
+      "additionalProperties": {
+        "$ref": "#/$defs/PropDefinition"
+      }
+    },
+    "states": {
+      "type": "array",
+      "description": "Visual and interactive states this component can be in.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "idle",
+          "active",
+          "loading",
+          "pending",
+          "acknowledged",
+          "granted",
+          "denied",
+          "expired",
+          "escalated",
+          "resolved",
+          "failed",
+          "dismissed"
+        ]
+      }
+    },
+    "accessibilityRole": {
+      "type": "string",
+      "enum": [
+        "alert",
+        "alertdialog",
+        "dialog",
+        "status",
+        "log",
+        "tooltip",
+        "region",
+        "complementary",
+        "banner",
+        "none"
+      ],
+      "description": "Primary ARIA role for this component. Follows WCAG 2.1 AA requirements as specified in components/*/accessibility.md."
+    },
+    "ariaLive": {
+      "type": "string",
+      "enum": ["off", "polite", "assertive"],
+      "description": "aria-live value for dynamic content announcements. 'assertive' only for critical/blocking severity components."
+    },
+    "focusBehavior": {
+      "type": "object",
+      "description": "Focus management specification for this component.",
+      "properties": {
+        "trap": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this component traps keyboard focus. True for blocking and modal components."
+        },
+        "initialFocus": {
+          "type": "string",
+          "description": "Which element receives focus on mount. 'first-action' | 'primary-action' | 'deny-first' | 'dismiss'."
+        },
+        "returnFocus": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether focus returns to the trigger element when the component unmounts."
+        }
+      }
+    },
+    "designTokens": {
+      "type": "object",
+      "description": "Design tokens consumed by this component. Keys are semantic purposes; values are CSS custom property names from components/design-tokens.md.",
+      "properties": {
+        "surface": {"type": "string"},
+        "text": {"type": "string"},
+        "icon": {"type": "string"},
+        "border": {"type": "string"},
+        "focus": {"type": "string"},
+        "entranceDuration": {"type": "string"},
+        "exitDuration": {"type": "string"},
+        "easing": {"type": "string"},
+        "elevation": {"type": "string"},
+        "zIndex": {"type": "string"}
+      }
+    },
+    "motion": {
+      "type": "object",
+      "description": "Motion specification. Follows components/*/motion.md.",
+      "properties": {
+        "entrance": {"type": "string", "description": "CSS animation or transition for component entrance."},
+        "exit": {"type": "string", "description": "CSS animation or transition for component exit."},
+        "reducedMotionFallback": {"type": "string", "description": "Fallback when prefers-reduced-motion is active."}
+      }
+    },
+    "responsive": {
+      "type": "object",
+      "description": "Responsive behavior per breakpoint. Follows components/*/responsive.md.",
+      "properties": {
+        "xs": {"type": "string"},
+        "sm": {"type": "string"},
+        "md": {"type": "string"},
+        "lg": {"type": "string"}
+      }
+    },
+    "auditIndicator": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this component renders a visible audit indicator (icon or badge) when an audit event is active."
+    },
+    "callbacks": {
+      "type": "array",
+      "description": "Event callbacks this component emits. The decision engine may bind audit logging to these.",
+      "items": {
+        "type": "object",
+        "required": ["name", "when"],
+        "properties": {
+          "name": {"type": "string"},
+          "when": {"type": "string"},
+          "auditRequired": {"type": "boolean", "default": false}
+        }
+      }
+    },
+    "specRef": {
+      "type": "string",
+      "description": "Relative path to the authoritative component specification file.",
+      "examples": [
+        "components/warning/component-spec.md",
+        "components/refusal/component-spec.md"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "PropDefinition": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array", "function", "ReactNode"]
+        },
+        "required": {"type": "boolean", "default": false},
+        "default": {},
+        "description": {"type": "string"},
+        "enum": {
+          "type": "array",
+          "description": "Allowed values for string enum props."
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "BlockingWarning",
+      "patternId": "blocking-warning",
+      "displayName": "Blocking Warning",
+      "variants": [
+        {"name": "inline-block", "severity": "blocking", "description": "Blocks content inline without full-screen overlay."},
+        {"name": "overlay", "severity": "blocking", "description": "Full-screen overlay that prevents all interaction."},
+        {"name": "policy", "severity": "blocking", "description": "Policy-attributed block with rule reference."}
+      ],
+      "props": {
+        "severity": {"type": "string", "required": true, "enum": ["blocking", "critical"]},
+        "message": {"type": "string", "required": true},
+        "policyRef": {"type": "string", "required": false, "description": "Policy rule ID for policy-warning variant."},
+        "onAcknowledge": {"type": "function", "required": false},
+        "onDismiss": {"type": "function", "required": false},
+        "auditId": {"type": "string", "required": true, "description": "Audit event ID. Passed through to audit callbacks."}
+      },
+      "states": ["idle", "active", "acknowledged", "dismissed"],
+      "accessibilityRole": "alertdialog",
+      "ariaLive": "assertive",
+      "focusBehavior": {
+        "trap": true,
+        "initialFocus": "primary-action",
+        "returnFocus": true
+      },
+      "designTokens": {
+        "surface": "--guardrail-severity-blocking-surface",
+        "text": "--guardrail-severity-blocking-text",
+        "border": "--guardrail-severity-blocking-border",
+        "focus": "--guardrail-focus-ring-color",
+        "entranceDuration": "--guardrail-duration-600",
+        "zIndex": "--guardrail-priority-blocking"
+      },
+      "motion": {
+        "entrance": "slide-up 600ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "exit": "fade-out 200ms ease-in",
+        "reducedMotionFallback": "opacity 0ms"
+      },
+      "responsive": {
+        "xs": "Full-screen overlay, stacked action buttons",
+        "sm": "Full-screen overlay, stacked action buttons",
+        "md": "Centered modal dialog",
+        "lg": "Centered modal dialog"
+      },
+      "auditIndicator": true,
+      "callbacks": [
+        {"name": "onMount", "when": "Component renders", "auditRequired": true},
+        {"name": "onAcknowledge", "when": "User clicks primary action", "auditRequired": true},
+        {"name": "onDismiss", "when": "User dismisses without acknowledging", "auditRequired": true}
+      ],
+      "specRef": "components/warning/component-spec.md"
+    }
+  ]
+}
