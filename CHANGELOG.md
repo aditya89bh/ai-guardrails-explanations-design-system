@@ -12,6 +12,52 @@ Work in progress across active phases.
 
 ---
 
+## Phase 3 — Guardrail Decision Engine
+
+**Status:** Complete
+**Commits:** 16
+**Goal:** Transform the repository from a collection of 36 pattern specifications into a complete, deterministic decision engine that governs how patterns are selected, combined, ordered, and orchestrated.
+
+### Added
+
+- `docs/decision-flows/decision-primitives.md` — Ten foundational input variables that every decision rule reads from: Risk (P1), Confidence (P2), Capability (P3), Permission (P4), Policy (P5), User Intent (P6), Business Impact (P7), User Authority (P8), Context Freshness (P9), and Source Reliability (P10). Each primitive defines its meaning, type, allowed values, computation method, influence on pattern selection, and related patterns. Defines the canonical primitive evaluation order (Policy evaluated first; User Intent used throughout to narrow selection space).
+
+- `docs/decision-flows/pattern-selection-engine.md` — Three-step selection process: (1) category gating determines which of the seven pattern categories activate, (2) within-category selection determines the specific pattern, (3) depth and severity calibration determines the operating level. Includes decision tables for each category, progressive warning escalation rules, the structured uncertainty disclosure override rule, the refusal pattern mutual exclusion rule, and selection fallback rules for every category.
+
+- `docs/decision-flows/pattern-precedence-engine.md` — Defines inter-category precedence order (Policy Refusal → Safe Refusal/Emergency Escalation → Blocking Warning → Escalation → Permission → Uncertainty → Explanation → Recovery → Warning), intra-category precedence within each of the seven categories, tie-break rules for tied patterns, cross-category conflict resolution rules (blocking warning + permission gate sequencing; uncertainty + refusal; escalation + recovery temporal relationship), suppression rules reference table, and the priority escalation path for unresolvable conflicts.
+
+- `docs/decision-flows/state-transition-engine.md` — State machines for all four stateful pattern categories: (1) Uncertainty State Machine — seven states (HC, MC, LC, CE, II, SC, UR), entry conditions, all valid transitions with triggers, invalid transitions with rationale, and recovery transitions; (2) Refusal State Machine — seven refusal states with entry conditions and sequencing rules including invalid sequences; (3) Escalation State Machine — nine flow states (PENDING through FAILED), valid and invalid transitions, emergency escalation interrupt-mode machine; (4) Recovery State Machine — eight flow states (TRIGGERED through ABANDONED), valid transitions, cascade sequence, invalid transitions; (5) Cross-Machine Transition Matrix — terminal state to entry state mappings across all four machines, including prohibited cross-machine transitions.
+
+- `docs/decision-flows/pattern-composition-engine.md` — Five composition principles (minimum necessary disclosure, sequential integrity, non-duplication, compositional closure). Legal composition sequences — twelve named sequences covering standard warning+permission flow, uncertainty+explanation flow, refusal+recovery flow, escalation+recovery flow, complex multi-step compositions. Illegal combinations — simultaneous illegal pairs (e.g., safe-refusal + any other refusal), sequential violations (permission before explanation), category conflicts (unresolvable + high-confidence). Composition cardinality limits (max 2 simultaneous warnings, 1 gate at a time, 3 recovery options). Five standard composition templates (A–E) for the most common interaction patterns.
+
+- `docs/decision-flows/orchestration-engine.md` — Five complete end-to-end orchestration examples, each including input, full primitive evaluation table, pattern selection reasoning, precedence resolution, composition sequence, and final interaction specification:
+  - **Healthcare — Clinical Decision Support:** Pharmacist vancomycin dosage query. Demonstrates constrained-completion as the correct pattern when Risk=4 applies to action-execution but not to decision-support intent; source citation (claim-level) and limitation disclosure required alongside.
+  - **Finance — Trade Pre-Approval:** Concentrated options trade request. Demonstrates policy-refusal as primary when tenant-level policy matches; partial-completion for suitability review preparation; role-escalation and redirect-recovery as alternatives.
+  - **Enterprise Assistant — Cross-Tenant Data Query:** Customer data sharing request. Demonstrates deployment-level policy match; partial-completion (internal summary) proceeding while external distribution is blocked; async-review-escalation path.
+  - **Developer Copilot — Secrets and Credentials:** Credential hardcoding request. Demonstrates platform-level (unconditional) policy-refusal with no override path; alternative-suggestion with three concrete secure alternatives; redirect-recovery via environment variable pattern.
+  - **Industrial AI — Autonomous Equipment Decision:** AI-initiated monitoring event, no user query. Demonstrates emergency-escalation in interrupt mode; constrained-completion within authorized bounds (load reduction) simultaneous with escalation; decision-summary to operator; limitation-disclosure that shutdown requires human authorization.
+
+### Changed
+
+- `docs/decision-flows/index.md` — Replaced Phase 1 scaffold with full Phase 3 engine index. Added decision engine architecture diagram, table of all six stable engine documents, retained planned granular flow documents (Phase 4+). Updated phase status. Added integration test specification note.
+- `docs/index.md` — Updated Decision Flows section to describe the Phase 3 decision engine. Added decision engine to engineer role navigation. Updated documentation status table to mark Decision Flows as complete.
+- `README.md` — Updated engineer usage guidance to include decision-flows as the starting point. Updated phase status table to mark Phases 1, 2, and 3 as complete with commit counts. Updated Phase 3 roadmap description with full engine scope.
+
+### Design Decisions
+
+- **Six-document engine architecture:** The decision engine is structured as six layers — primitives, selection, precedence, state machines, composition, orchestration — corresponding to the order in which a production system evaluates an interaction. This layered architecture allows individual components to be updated independently when deployment requirements change.
+- **Deterministic rules throughout:** Every rule in the engine produces the same output for the same inputs. Probabilistic or judgment-based selections are not present in the engine — those belong in the AI's inference layer, not the guardrail layer.
+- **Orchestration examples as integration test specifications:** The five orchestration examples are not illustrative scenarios; they are specifications. A conforming implementation must produce the same pattern activations for the same primitive values. This makes the examples the primary integration test cases for teams implementing the design system.
+- **Cross-machine transition matrix:** Adding a formal matrix connecting the four stateful machines (uncertainty → refusal → escalation → recovery) makes the full interaction lifecycle traceable. Prohibited cross-machine transitions are explicitly named to prevent common implementation errors.
+- **Composition cardinality limits:** Explicit limits on simultaneous warnings, gates, and recovery options prevent over-disclosure — a known failure mode where excessive guardrail activation undermines user trust by appearing excessive or inconsistent.
+
+### Known Gaps
+
+- Granular per-category decision flow documents (Phase 4) remain planned. Phase 3 addresses the full system level; individual pattern-level selection tables are not yet authored as standalone documents.
+- Customer support domain example was de-scoped in favor of the industrial AI example, which demonstrates the more architecturally distinct case (AI-initiated event, no user query, interrupt-mode escalation). Customer support orchestration is planned for Phase 7 case studies.
+
+---
+
 ## Phase 2G — Recovery Flow Specifications
 
 **Status:** Complete
