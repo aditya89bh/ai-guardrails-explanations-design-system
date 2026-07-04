@@ -41,9 +41,11 @@ Every pattern has an associated severity level that determines the friction it i
 | Sub-type | Definition |
 |---|---|
 | **Inline warning** | Warning appears within the flow of content, adjacent to the element it concerns |
-| **Modal warning** | Warning interrupts the current flow with a blocking overlay |
+| **Modal warning** | Warning interrupts the current flow with a blocking overlay requiring acknowledgment |
 | **Ambient warning** | Persistent, non-blocking warning in a secondary UI zone |
-| **Progressive warning** | Warning that escalates in severity as the user continues toward a risky action |
+| **Blocking warning** | Hard stop that requires a specific resolution action before forward progress is permitted; the user cannot dismiss or click past it |
+| **Progressive warning** | Warning that escalates in severity across defined stages as the user moves toward a risky action |
+| **Policy warning** | Warning triggered by a match between a user action and a defined organizational or regulatory policy rule; severity is determined by the policy rule configuration |
 
 ### Explanation Pattern Variants
 
