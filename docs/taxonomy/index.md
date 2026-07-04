@@ -100,12 +100,17 @@ Refusal states describe the AI's interaction strategy when it cannot fulfill a r
 
 ### Escalation Path Variants
 
+Escalation paths route a request, decision, incident, or exception to a higher authority — human or system — when the AI's authorization level, policy scope, or confidence ceiling is insufficient. Escalation paths focus on routing mechanics, context transfer, ownership, SLA enforcement, and fallback behavior.
+
+> **Human handoff — two distinct patterns:** The refusal-category human handoff (`patterns/refusal/human-handoff.md`) is triggered by inability and focuses on what the user receives. The escalation-category human handoff (`patterns/escalation/human-handoff.md`) is triggered by authorization or scope constraints and focuses on routing, ownership, and fallback.
+
 | Sub-type | Definition |
 |---|---|
-| **Human handoff** | Routes the interaction to a human agent |
-| **Role escalation** | Routes to a user with higher authorization level |
-| **System escalation** | Routes to a higher-authority system or approval workflow |
-| **Emergency escalation** | Immediate escalation for safety-critical situations |
+| **Human handoff (escalation)** | Routes a request, decision, incident, or exception to a human agent because the AI's authorization level, policy scope, or confidence ceiling is insufficient. Distinct from the refusal-category human handoff: trigger is scope/authority, not inability. |
+| **Role escalation** | Routes from the current user's role to a role with higher organizational authority. Triggered when the current role's authority ceiling is exceeded for the requested action. Governed by the organizational role hierarchy. |
+| **System escalation** | Routes from the current AI system to a higher-authority or more capable automated system. Triggered when the AI cannot proceed autonomously and the solution requires a different system's authority. Requires well-defined API contracts, retry logic, and observability. |
+| **Emergency escalation** | Immediate, interrupt-mode routing for safety, security, compliance, or operational emergencies. Bypasses normal queues and SLA windows. Self-authorizing. Routes simultaneously to all required parties. |
+| **Async review escalation** | Non-immediate routing to a review queue for human evaluation that is time-separated from the originating interaction. The user's workflow may continue while the review proceeds. Governed by SLA windows and queue management. |
 
 ### Recovery Flow Variants
 
