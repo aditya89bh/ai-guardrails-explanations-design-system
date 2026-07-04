@@ -1,46 +1,107 @@
 # AI Guardrails & Explanations Design System
 
-A documentation-first design system for enterprise AI teams building trust and safety into AI products — covering when and how AI should warn, explain, ask permission, express uncertainty, refuse, escalate, or recover.
+> A documentation-first design system for enterprise AI teams building trust and safety into AI products.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Phase](https://img.shields.io/badge/phase-8%20complete-brightgreen)](CHANGELOG.md)
+[![Patterns](https://img.shields.io/badge/patterns-36-informational)](patterns/)
+[![Playground](https://img.shields.io/badge/playground-live-purple)](playground/README.md)
 
 ---
 
-## Who This Is For
+## What This Is
 
-- **Enterprise AI teams** shipping AI features to production at scale
-- **Product teams** in regulated or high-stakes domains (healthcare, finance, legal, infrastructure)
-- **Platform teams** standardizing AI behavior and user communication patterns across products
-- **Compliance and trust & safety teams** defining guardrail policies for AI deployments
+A complete specification system covering **when and how AI should warn, explain, ask permission, express uncertainty, refuse, escalate, and recover** — with decision logic, pattern specifications, component guidance, reference implementations, and an interactive playground.
+
+This is not a list of safety principles. It is a working system with:
+
+- **36 pattern specifications** across 7 categories
+- **A deterministic decision engine** with 10 input primitives and 14 selection rules
+- **UI component specifications** for every pattern
+- **Industry-specific deployment configurations** for healthcare, finance, developer tools, and industrial AI
+- **4 JSON schemas** and 4 YAML deployment configurations
+- **React reference implementations** for every component
+- **An interactive playground** — run it locally in 60 seconds
 
 ---
 
-## What Problem It Solves
+## Quick Start
 
-AI systems make consequential decisions — but most design systems ignore the UX and logic of trust, refusal, uncertainty, and escalation. This system fills that gap.
+**See the engine in action (60 seconds):**
 
-It answers questions like:
+```bash
+git clone https://github.com/your-org/ai-guardrails-explanations-design-system.git
+cd ai-guardrails-explanations-design-system/playground
+npm install
+npm run dev
+# Open http://localhost:3000
+```
 
-- When should an AI warn a user instead of proceeding silently?
-- How should an AI express that it is uncertain about its output?
-- What does a good AI refusal look like versus a bad one?
-- When should AI escalate to a human instead of acting?
-- How should AI request permission before taking an irreversible action?
-- How do users recover after an AI error or refusal?
+Manipulate decision primitives (P1–P10) and watch the engine select patterns, activate components, and generate an audit trail in real time.
 
-This system provides decision logic, pattern specifications, UI component guidance, and enterprise playbooks — not vague safety principles.
+**Start reading by role:**
+
+| I am a… | Start here |
+|---|---|
+| Product designer or PM | [docs/principles/](docs/principles/) → [Pattern categories](#pattern-categories) |
+| Engineer implementing the system | [docs/getting-started.md](docs/getting-started.md) → [reference/](reference/README.md) |
+| Engineer exploring the decision engine | [docs/architecture.md](docs/architecture.md) → [docs/decision-flows/](docs/decision-flows/) |
+| Enterprise architect or compliance lead | [docs/enterprise-playbooks/](docs/enterprise-playbooks/) → [reference/yaml/](reference/yaml/) |
+| Open-source contributor | [CONTRIBUTING.md](CONTRIBUTING.md) → [docs/glossary.md](docs/glossary.md) |
+| Just browsing | [docs/navigation.md](docs/navigation.md) — the full repo map |
 
 ---
 
 ## Pattern Categories
 
-| Category | Description |
-|---|---|
-| **Warning patterns** | When and how to surface alerts before a user proceeds |
-| **Explanation patterns** | How AI communicates its reasoning, sources, and confidence |
-| **Permission gates** | How AI requests user authorization before consequential actions |
-| **Uncertainty states** | How AI represents and communicates output confidence |
-| **Refusal states** | How AI declines requests — with clarity, context, and grace |
-| **Escalation paths** | When and how AI hands off to humans or higher-authority systems |
-| **Recovery flows** | How users return to productive states after errors, refusals, or failures |
+The system defines 36 patterns across 7 categories:
+
+| Category | Patterns | When to use |
+|---|---|---|
+| [**Warning**](patterns/warning/) | 6 patterns | Surface alerts before a user proceeds — inline, ambient, modal, blocking, progressive, policy |
+| [**Explanation**](patterns/explanation/) | 6 patterns | Communicate AI reasoning, confidence, sources, and limitations |
+| [**Permission**](patterns/permission/) | 6 patterns | Request authorization before consequential or irreversible actions |
+| [**Uncertainty**](patterns/uncertainty/) | 7 states | Represent 7 distinct AI epistemic states — from high confidence to unresolvable conflict |
+| [**Refusal**](patterns/refusal/) | 7 patterns | Decline requests with clarity, context, and viable alternatives |
+| [**Escalation**](patterns/escalation/) | 5 paths | Hand off to humans or higher-authority systems — role, system, emergency, async, handoff |
+| [**Recovery**](patterns/recovery/) | 5 flows | Return users to productive states after errors, refusals, or failures |
+
+---
+
+## Decision Engine
+
+The Guardrail Decision Engine maps 10 input primitives to pattern activations:
+
+```
+P1 Risk · P2 Confidence · P3 Capability · P4 Permission · P5 Policy
+P6 Intent · P7 Business Impact · P8 Authority · P9 Freshness · P10 Source Reliability
+
+              ↓  14 selection rules  ↓
+
+    Pattern selection → Composition → Component activation → Audit
+```
+
+See [docs/architecture.md](docs/architecture.md) for the full architectural overview.
+See [docs/decision-flows/](docs/decision-flows/) for the complete 6-document engine specification.
+
+---
+
+## Interactive Playground
+
+The playground visualizes the entire pipeline:
+
+- **Left panel** — Editable controls for all 10 decision primitives
+- **Center panel** — Rule evaluation (activated / skipped / not evaluated), pattern list, composition layer, state machine, pipeline flow
+- **Right panel** — Live-rendered guardrail components
+- **Bottom panel** — Chronological audit trail
+
+Five predefined scenarios cover Healthcare, Finance, Developer Copilot, Industrial AI, and Customer Support.
+
+```bash
+cd playground && npm install && npm run dev
+```
+
+Full documentation: [playground/README.md](playground/README.md)
 
 ---
 
@@ -49,125 +110,118 @@ This system provides decision logic, pattern specifications, UI component guidan
 ```
 ai-guardrails-explanations-design-system/
 │
-├── README.md                        # This file
-├── CHANGELOG.md                     # Phase-by-phase progress log
-├── CONTRIBUTING.md                  # Contribution standards and process
-├── LICENSE                          # MIT license
+├── README.md                        ← You are here
+├── CHANGELOG.md                     ← Phase-by-phase progress log
+├── CONTRIBUTING.md                  ← How to contribute
+├── SECURITY.md                      ← Vulnerability reporting
+├── CODE_OF_CONDUCT.md               ← Community standards
+├── SUPPORT.md                       ← Getting help
+├── ROADMAP.md                       ← Where this is going
+├── LICENSE                          ← MIT
 │
-├── docs/                            # Primary documentation
-│   ├── index.md                     # Documentation hub and navigation
-│   ├── principles/                  # Core design principles
-│   ├── taxonomy/                    # Guardrail and explanation taxonomy
-│   ├── patterns/                    # Pattern specifications (decision logic)
-│   ├── decision-flows/              # Flowcharts and logic trees
-│   ├── enterprise-playbooks/        # Deployment guidance for enterprise teams
-│   ├── regulated-industries/        # Domain-specific guidance
-│   └── case-studies/               # Reference implementations and examples
+├── docs/                            ← Primary documentation
+│   ├── getting-started.md           ← Start here if you are new
+│   ├── architecture.md              ← System architecture overview
+│   ├── glossary.md                  ← Canonical term definitions
+│   ├── faq.md                       ← Frequently asked questions
+│   ├── troubleshooting.md           ← Common issues and fixes
+│   ├── navigation.md                ← Full repository map
+│   ├── project-structure.md         ← Directory and file conventions
+│   ├── index.md                     ← Documentation hub
+│   ├── diagrams/                    ← Mermaid architecture diagrams
+│   ├── principles/                  ← Core design principles
+│   ├── taxonomy/                    ← Guardrail and explanation taxonomy
+│   ├── patterns/                    ← Pattern decision logic
+│   ├── decision-flows/              ← 6-document decision engine
+│   ├── enterprise-playbooks/        ← Enterprise deployment guidance
+│   ├── regulated-industries/        ← Domain-specific guidance
+│   └── case-studies/                ← 8 end-to-end case studies
 │
-├── patterns/                        # Machine-readable pattern definitions
-├── components/                      # UI component specifications
-├── examples/                        # Annotated implementation examples
-├── templates/                       # Reusable starting-point templates
-├── reference/                       # Machine-readable artifacts (schemas, YAML, React examples)
-│   ├── json/                        # 4 JSON schemas (patterns, engine, component, policy)
-│   ├── yaml/                        # Industry-specific deployment configurations
-│   ├── config/                      # Reference configuration documents
-│   ├── react/                       # React component reference implementations
-│   ├── nextjs/                      # Next.js full-pipeline demo
-│   └── examples/                    # Complete JSON example payloads
+├── patterns/                        ← 36 pattern specifications
+│   ├── warning/                     ← 6 warning patterns
+│   ├── explanation/                 ← 6 explanation patterns
+│   ├── permission/                  ← 6 permission patterns
+│   ├── uncertainty/                 ← 7 uncertainty states
+│   ├── refusal/                     ← 7 refusal patterns
+│   ├── escalation/                  ← 5 escalation paths
+│   └── recovery/                    ← 5 recovery flows
 │
-└── playground/                      # Interactive Decision Engine Playground (Phase 7)
-    ├── app/                         # Next.js App Router pages and global styles
-    ├── components/                  # Playground UI components + guardrail renderers
-    ├── engine/                      # Decision engine (primitives, rules, evaluator, bridges)
-    └── data/                        # Pattern registry and scenario definitions
+├── components/                      ← UI component specifications
+├── examples/                        ← Annotated implementation examples
+├── templates/                       ← Reusable starting-point templates
+│
+├── reference/                       ← Machine-readable implementation artifacts
+│   ├── json/                        ← 4 JSON schemas
+│   ├── yaml/                        ← 4 industry YAML configurations
+│   ├── config/                      ← 5 configuration reference docs
+│   ├── react/                       ← 6 React component implementations
+│   ├── nextjs/                      ← Next.js full-pipeline demo
+│   └── examples/                    ← 4 complete JSON example payloads
+│
+└── playground/                      ← Interactive Decision Engine Playground
+    ├── app/                         ← Next.js App Router (layout, page, CSS)
+    ├── components/                  ← 13 playground UI components
+    ├── engine/                      ← Decision engine (5 modules)
+    └── data/                        ← Pattern registry + 5 scenarios
 ```
 
 ---
 
-## How to Use This Design System
+## Implementation Path
 
-This system is designed to be consumed in layers depending on your role:
+Following this path produces a working enterprise guardrail system:
 
-### Product designers and PMs
-Start with [`docs/principles/`](docs/principles/) to understand the design philosophy, then browse [`docs/patterns/`](docs/patterns/) for specific interaction patterns.
+```
+1. Read docs/architecture.md         — understand the system
+2. Configure reference/yaml/         — pick your industry config
+3. Implement reference/react/        — integrate the components
+4. Validate against reference/json/  — verify your payloads
+5. Test with playground/             — observe engine behavior
+6. Audit with reference/examples/    — verify audit output
+```
 
-### Engineers
-Start with the decision engine in [`docs/decision-flows/`](docs/decision-flows/) to understand the selection, precedence, composition, and state-transition logic. Then read the pattern specs in [`patterns/`](patterns/) and the component specifications in [`components/`](components/). Use [`examples/`](examples/) for annotated implementations.
+---
 
-### Enterprise architects and compliance leads
-Begin with [`docs/enterprise-playbooks/`](docs/enterprise-playbooks/) and [`docs/regulated-industries/`](docs/regulated-industries/) for governance-ready guidance. Use [`docs/case-studies/`](docs/case-studies/) to validate pattern behavior against your industry context.
+## Industry Support
 
-### Engineers validating an implementation
-Start with [`docs/case-studies/`](docs/case-studies/) to find the closest reference implementation for your deployment context. Cross-reference the pattern sequence and audit trail from the case study against your implementation.
+The design system has been specified, validated, and configured for:
 
-### Engineers implementing the system
-Start with [`reference/`](reference/README.md) for machine-readable schemas, deployment YAML configurations, React component examples, and example JSON payloads. Copy the closest YAML config and validate against the JSON schemas.
-
-### Anyone who wants to see the engine in action
-Open the [`playground/`](playground/README.md) — a live Next.js app that lets you manipulate decision primitives and observe the resulting patterns, components, and audit trail in real time. Run `cd playground && npm install && npm run dev`.
-
-### New contributors
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review the taxonomy in [`docs/taxonomy/`](docs/taxonomy/) before adding new patterns.
+| Industry | Config | Case Study | Key patterns |
+|---|---|---|---|
+| Healthcare (Clinical AI) | [healthcare-config.yaml](reference/yaml/healthcare-config.yaml) | Case Study 01 | Constrained completion, confidence disclosure, role escalation |
+| Financial Services | [finance-config.yaml](reference/yaml/finance-config.yaml) | Case Study 02 | Policy refusal, emergency escalation, one-time permission |
+| Developer Tools | [developer-copilot-config.yaml](reference/yaml/developer-copilot-config.yaml) | Case Study 03 | Safe refusal, reasoning trace, source citation |
+| Industrial AI | [industrial-ai-config.yaml](reference/yaml/industrial-ai-config.yaml) | Case Study 04 | Emergency escalation, abandon recovery, unresolvable state |
+| Customer Support | Covered in scenarios | — | Insufficient information, clarification request, human handoff |
 
 ---
 
 ## Current Phase Status
 
-| Phase | Name | Status | Target Commits |
+| Phase | Name | Status | Commits |
 |---|---|---|---|
-| **Phase 1** | Foundation | ✅ Complete | ~20 commits |
-| **Phase 2** | Core Pattern Specifications | ✅ Complete — 36 pattern specs | ~90 commits |
-| **Phase 3** | Guardrail Decision Engine | ✅ Complete — 6-document decision engine | ~16 commits |
-| **Phase 4** | AI Component Library | ✅ Complete — 47 component documents across 7 categories | ~21 commits |
-| **Phase 5** | Reference Implementations & Case Studies | ✅ Complete — 8 case studies across 8 industries + comparison matrix | ~15 commits |
-| **Phase 6** | Developer SDK & Reference Implementation | ✅ Complete — 4 JSON schemas, 4 YAML configs, 6 React examples, Next.js demo, 4 JSON payloads | ~25 commits |
-| **Phase 7** | Interactive Playground & Validation | ✅ Complete — Next.js playground, 14-rule engine, 5 scenarios, 5 visualization tabs, full component rendering | ~23 commits |
-| Phase 8 | Enterprise Playbooks | Planned | ~40 commits |
-| Phase 9 | Regulated Industries | Planned | ~40 commits |
-| Phase 10 | Extended Case Studies & Templates | Planned | ~30 commits |
-| Phase 11 | Review, Polish, and Release | Planned | ~20 commits |
-| **Total** | | | **~350 commits** |
+| **Phase 1** | Foundation | ✅ Complete | ~20 |
+| **Phase 2** | Core Pattern Specifications | ✅ Complete — 36 patterns | ~90 |
+| **Phase 3** | Guardrail Decision Engine | ✅ Complete — 6-document engine | ~16 |
+| **Phase 4** | AI Component Library | ✅ Complete — 47 component docs | ~21 |
+| **Phase 5** | Reference Implementations & Case Studies | ✅ Complete — 8 case studies | ~15 |
+| **Phase 6** | Developer SDK & Reference Implementation | ✅ Complete — schemas, configs, React, Next.js | ~25 |
+| **Phase 7** | Interactive Playground & Validation | ✅ Complete — 14-rule engine, 5 scenarios | ~23 |
+| **Phase 8** | Production Hardening & Open Source Release | ✅ Complete — CI, docs, community files | ~30 |
+| Phase 9 | Enterprise Playbooks | Planned | ~40 |
+| Phase 10 | Regulated Industries | Planned | ~40 |
+| Phase 11 | Extended Case Studies & Templates | Planned | ~30 |
+| Phase 12 | Review, Polish, and Release | Planned | ~20 |
+| **Total** | | | **~370 commits** |
 
 ---
 
-## Roadmap to ~350 Commits
+## Contributing
 
-### Phase 1 — Foundation (~20 commits)
-Repository structure, documentation index, taxonomy scaffold, principles overview, contribution guide, and licensing.
-
-### Phase 2 — Core Pattern Specifications (~60 commits)
-Full specification for each of the seven guardrail pattern categories: warning, explanation, permission gate, uncertainty state, refusal state, escalation path, and recovery flow. Each pattern gets its own specification file covering definition, trigger conditions, decision logic, user communication guidelines, and antipatterns.
-
-### Phase 4 — AI Component Library (~21 commits) — Complete
-A complete UI component library for all 36 guardrail patterns. For each of the seven pattern categories (warning, explanation, permission, uncertainty, refusal, escalation, recovery), the library provides: component specification (anatomy, props, states, variants), interaction model (pointer, keyboard, touch), accessibility specification (ARIA roles, screen reader announcements, focus management), motion specification (entrance, exit, state transitions, reduced-motion fallbacks), and responsive specification (breakpoints, mobile behavior, touch targets). Shared library documents cover design tokens, implementation guidelines (React, Vue, Web Components, iOS, Android, enterprise dashboards, dark mode, i18n, RTL), accessibility checklist (WCAG 2.1 AA), and a complete component matrix mapping all 36 patterns to their components.
-
-### Phase 3 — Guardrail Decision Engine (~16 commits) — Complete
-A six-document decision engine that governs how all 36 pattern specifications are selected, combined, ordered, and orchestrated. Documents: decision primitives (P1–P10), pattern selection engine (three-step selection), pattern precedence engine (conflict resolution), state transition engine (four state machines with cross-machine transition matrix), pattern composition engine (legal/illegal combinations and standard templates), and orchestration engine (five complete domain examples: healthcare, finance, enterprise assistant, developer copilot, industrial AI).
-
-### Phase 4 — UI Component Specifications (~50 commits)
-Visual and behavioral specifications for UI components that implement each pattern. Covers anatomy, states, accessibility, motion, and responsive behavior.
-
-### Phase 6 — Developer SDK & Reference Implementation (~25 commits) — Complete
-Machine-readable artifacts for teams implementing the design system in code. Includes: four JSON schemas (patterns, decision engine, component, policy), four deployment YAML configurations (healthcare, finance, developer copilot, industrial AI), five configuration reference documents (default policy, severity, risk, confidence, permission), six React component reference implementations (WarningBanner, PermissionGate, ConfidenceBadge, RefusalCard, RecoveryPrompt, EmergencyEscalationOverlay), a Next.js full-pipeline demo page, and four example JSON payloads matching the Phase 5 case studies.
-
-### Phase 5 — Reference Implementations & Case Studies (~15 commits) — Complete
-Eight end-to-end case studies across healthcare, financial services, insurance, enterprise HR, customer support, developer tools, manufacturing, and procurement. Each case study demonstrates the full decision engine → pattern selection → component activation → user journey → audit trail → recovery flow pipeline. Includes a cross-industry comparison matrix covering risk, pattern coverage, escalation paths, recovery flows, audit levels, and accessibility.
-
-### Phase 7 — Interactive Playground & Validation (~23 commits) — Complete
-An interactive Next.js application demonstrating the full decision engine pipeline. Features: editable P1–P10 primitive controls, rule evaluation visualization (14 selection rules), pattern activation display, real component rendering (all 7 guardrail categories), P2 state machine visualization, pattern composition layer, 5 industry scenarios (healthcare, finance, developer copilot, industrial AI, customer support), chronological audit trail, responsive layout, and WCAG 2.1 AA accessibility. Run: `cd playground && npm install && npm run dev`.
-
-### Phase 8 — Enterprise Playbooks (~40 commits)
-Deployment guidance for enterprise AI teams. Covers: policy configuration, audit trail requirements, multi-tenant considerations, localization, and organizational rollout.
-
-### Phase 9 — Regulated Industries (~40 commits)
-Domain-specific pattern variants for healthcare, financial services, legal, government, and critical infrastructure. Covers compliance requirements that affect pattern behavior.
-
-### Phase 10 — Extended Case Studies & Templates (~30 commits)
-Reusable pattern templates, decision-flow templates, and tooling for teams adopting the design system.
-
-### Phase 11 — Review, Polish, and Release (~20 commits)
-Cross-reference audit, broken link checks, terminology consistency review, final changelog, and release tagging.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Before contributing, read:
+1. [docs/glossary.md](docs/glossary.md) — canonical terminology
+2. [docs/taxonomy/](docs/taxonomy/) — pattern categories and naming
+3. [docs/principles/](docs/principles/) — design philosophy
 
 ---
 
