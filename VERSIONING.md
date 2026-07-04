@@ -93,4 +93,4 @@ Pre-release versions use the following identifiers:
 
 | Version | Date | Type | Summary |
 |---|---|---|---|
-| v1.0.0 | Phase 9 complete | Major | Initial stable release — 191 commits across Phases 1–9 |
+| v1.0.0 | Phase 9 complete | Major | Initial stable release — 216 commits across Phases 1–9; 36 patterns, 165 tests, 5 CI workflows |
