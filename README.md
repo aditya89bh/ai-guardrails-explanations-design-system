@@ -80,7 +80,7 @@ This system is designed to be consumed in layers depending on your role:
 Start with [`docs/principles/`](docs/principles/) to understand the design philosophy, then browse [`docs/patterns/`](docs/patterns/) for specific interaction patterns.
 
 ### Engineers
-Read the pattern specs in [`patterns/`](patterns/) and the component specifications in [`components/`](components/). Use [`examples/`](examples/) for annotated implementations.
+Start with the decision engine in [`docs/decision-flows/`](docs/decision-flows/) to understand the selection, precedence, composition, and state-transition logic. Then read the pattern specs in [`patterns/`](patterns/) and the component specifications in [`components/`](components/). Use [`examples/`](examples/) for annotated implementations.
 
 ### Enterprise architects and compliance leads
 Begin with [`docs/enterprise-playbooks/`](docs/enterprise-playbooks/) and [`docs/regulated-industries/`](docs/regulated-industries/) for governance-ready guidance.
@@ -94,9 +94,9 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review t
 
 | Phase | Name | Status | Target Commits |
 |---|---|---|---|
-| **Phase 1** | Foundation | ✅ In Progress | ~20 commits |
-| Phase 2 | Core Pattern Specifications | Planned | ~60 commits |
-| Phase 3 | Decision Flows and Logic Trees | Planned | ~50 commits |
+| **Phase 1** | Foundation | ✅ Complete | ~20 commits |
+| **Phase 2** | Core Pattern Specifications | ✅ Complete — 36 pattern specs | ~90 commits |
+| **Phase 3** | Guardrail Decision Engine | ✅ Complete — 6-document decision engine | ~16 commits |
 | Phase 4 | UI Component Specifications | Planned | ~50 commits |
 | Phase 5 | Enterprise Playbooks | Planned | ~40 commits |
 | Phase 6 | Regulated Industries | Planned | ~40 commits |
@@ -115,8 +115,8 @@ Repository structure, documentation index, taxonomy scaffold, principles overvie
 ### Phase 2 — Core Pattern Specifications (~60 commits)
 Full specification for each of the seven guardrail pattern categories: warning, explanation, permission gate, uncertainty state, refusal state, escalation path, and recovery flow. Each pattern gets its own specification file covering definition, trigger conditions, decision logic, user communication guidelines, and antipatterns.
 
-### Phase 3 — Decision Flows and Logic Trees (~50 commits)
-Structured decision flowcharts for each pattern category. Covers: when to trigger, which variant to use, how severity is determined, and how patterns chain together.
+### Phase 3 — Guardrail Decision Engine (~16 commits) — Complete
+A six-document decision engine that governs how all 36 pattern specifications are selected, combined, ordered, and orchestrated. Documents: decision primitives (P1–P10), pattern selection engine (three-step selection), pattern precedence engine (conflict resolution), state transition engine (four state machines with cross-machine transition matrix), pattern composition engine (legal/illegal combinations and standard templates), and orchestration engine (five complete domain examples: healthcare, finance, enterprise assistant, developer copilot, industrial AI).
 
 ### Phase 4 — UI Component Specifications (~50 commits)
 Visual and behavioral specifications for UI components that implement each pattern. Covers anatomy, states, accessibility, motion, and responsive behavior.
