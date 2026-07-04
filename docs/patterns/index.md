@@ -124,15 +124,15 @@ Escalation paths route a request, decision, incident, or exception to a higher a
 
 ## Recovery Flows
 
-Recovery flows return the user to productive work after a warning, refusal, error, or escalation.
+Recovery flows return the user to productive work after a warning, permission denial, uncertainty state, refusal, or escalation. Each flow has a distinct objective: retry re-executes, redirect re-routes, repair corrects, override bypasses, abandon exits cleanly.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Retry Recovery | Retry | 🔲 | `patterns/recovery/retry-recovery.md` |
-| Redirect Recovery | Redirect | 🔲 | `patterns/recovery/redirect-recovery.md` |
-| Repair Recovery | Repair | 🔲 | `patterns/recovery/repair-recovery.md` |
-| Manual Override Recovery | Manual override | 🔲 | `patterns/recovery/manual-override-recovery.md` |
-| Abandon Recovery | Abandon | 🔲 | `patterns/recovery/abandon-recovery.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| Retry Recovery | Retry | Informational–Advisory (0–1) | 🟢 | [`patterns/recovery/retry-recovery.md`](../../patterns/recovery/retry-recovery.md) |
+| Redirect Recovery | Redirect | Informational–Advisory (0–1) | 🟢 | [`patterns/recovery/redirect-recovery.md`](../../patterns/recovery/redirect-recovery.md) |
+| Repair Recovery | Repair | Advisory–Caution (1–2) | 🟢 | [`patterns/recovery/repair-recovery.md`](../../patterns/recovery/repair-recovery.md) |
+| Manual Override Recovery | Manual override | Caution–Blocking (2–3) | 🟢 | [`patterns/recovery/manual-override-recovery.md`](../../patterns/recovery/manual-override-recovery.md) |
+| Abandon Recovery | Abandon | Informational–Advisory (0–1) | 🟢 | [`patterns/recovery/abandon-recovery.md`](../../patterns/recovery/abandon-recovery.md) |
 
 ---
 
