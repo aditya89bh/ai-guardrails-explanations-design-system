@@ -1,0 +1,23 @@
+{
+  "name": "ai-guardrails-tests",
+  "version": "1.0.0",
+  "description": "Validation and smoke tests for the AI Guardrails & Explanations Design System",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "test:engine": "node --test engine/",
+    "test:schemas": "node --test schemas/",
+    "test:payloads": "node --test payloads/",
+    "test:yaml": "node --test yaml/",
+    "test:smoke": "node --test smoke/"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
