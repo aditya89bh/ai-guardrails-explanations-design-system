@@ -32,7 +32,7 @@ A limitation disclosure communicates a specific, functional boundary of the AI s
 
 ## When Not to Use
 
-- The limitation is a one-time, transient error — use an error recovery flow instead
+- The limitation is a one-time, transient error — use a recovery flow instead
 - The limitation applies to all AI outputs in this deployment, universally — an ambient warning at session start is more appropriate than per-output limitation disclosure
 - The limitation is so fundamental that it constitutes a refusal — if the AI cannot meaningfully engage with the request at all, use a refusal state
 - The "limitation" is actually uncertainty about a specific output — use confidence disclosure instead; limitation disclosure describes structural capability boundaries, not output-level confidence
