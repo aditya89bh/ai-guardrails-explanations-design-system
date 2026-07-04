@@ -74,30 +74,33 @@ Permission gates require explicit user authorization before the AI proceeds with
 
 ## Uncertainty States
 
-Uncertainty states express the AI's confidence level in its output and adjust user communication accordingly.
+Uncertainty states describe the AI's internal operating state with respect to the reliability of its output for a given query. Each state determines which explanation patterns activate, which actions are permitted, and how user interaction is structured.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| High Confidence State | High confidence | 🔲 | `patterns/uncertainty/high-confidence-state.md` |
-| Moderate Confidence State | Moderate confidence | 🔲 | `patterns/uncertainty/moderate-confidence-state.md` |
-| Low Confidence State | Low confidence | 🔲 | `patterns/uncertainty/low-confidence-state.md` |
-| Unresolvable Uncertainty State | Unresolvable | 🔲 | `patterns/uncertainty/unresolvable-uncertainty-state.md` |
-| Conflicting Sources State | Low / moderate | 🔲 | `patterns/uncertainty/conflicting-sources-state.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| High Confidence State | High confidence | Informational (0) | 🟢 | [`patterns/uncertainty/high-confidence-state.md`](../../patterns/uncertainty/high-confidence-state.md) |
+| Moderate Confidence State | Moderate confidence | Advisory (1) | 🟢 | [`patterns/uncertainty/moderate-confidence-state.md`](../../patterns/uncertainty/moderate-confidence-state.md) |
+| Low Confidence State | Low confidence | Caution (2) | 🟢 | [`patterns/uncertainty/low-confidence-state.md`](../../patterns/uncertainty/low-confidence-state.md) |
+| Conflicting Evidence State | Conflicting sources | Caution (2) | 🟢 | [`patterns/uncertainty/conflicting-evidence-state.md`](../../patterns/uncertainty/conflicting-evidence-state.md) |
+| Insufficient Information State | Information absence | Caution–Blocking (2–3) | 🟢 | [`patterns/uncertainty/insufficient-information-state.md`](../../patterns/uncertainty/insufficient-information-state.md) |
+| Stale Context State | Stale data | Advisory–Caution (1–2) | 🟢 | [`patterns/uncertainty/stale-context-state.md`](../../patterns/uncertainty/stale-context-state.md) |
+| Unresolvable State | Terminal uncertainty | Blocking–Critical (3–4) | 🟢 | [`patterns/uncertainty/unresolvable-state.md`](../../patterns/uncertainty/unresolvable-state.md) |
 
 ---
 
 ## Refusal States
 
-Refusal states decline to fulfill a request, with appropriate communication about why and what the user can do next.
+Refusal states describe the AI's interaction strategy when it cannot fulfill a request as stated. Each variant defines what is refused, what can still be provided, and what the user's path forward is.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Policy Refusal | Policy refusal | 🔲 | `patterns/refusal/policy-refusal.md` |
-| Capability Refusal | Capability refusal | 🔲 | `patterns/refusal/capability-refusal.md` |
-| Safety Refusal | Safety refusal | 🔲 | `patterns/refusal/safety-refusal.md` |
-| Scope Refusal | Scope refusal | 🔲 | `patterns/refusal/scope-refusal.md` |
-| Graceful Degradation | Partial fulfillment | 🔲 | `patterns/refusal/graceful-degradation.md` |
-| Contextual Refusal | Context-dependent | 🔲 | `patterns/refusal/contextual-refusal.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| Safe Refusal | Safety refusal | Blocking–Critical (3–4) | 🟢 | [`patterns/refusal/safe-refusal.md`](../../patterns/refusal/safe-refusal.md) |
+| Partial Completion | Graceful degradation | Advisory–Caution (1–2) | 🟢 | [`patterns/refusal/partial-completion.md`](../../patterns/refusal/partial-completion.md) |
+| Constrained Completion | Scope refusal (modified fulfillment) | Advisory–Caution (1–2) | 🟢 | [`patterns/refusal/constrained-completion.md`](../../patterns/refusal/constrained-completion.md) |
+| Alternative Suggestion | Capability refusal (with redirection) | Advisory (1) | 🟢 | [`patterns/refusal/alternative-suggestion.md`](../../patterns/refusal/alternative-suggestion.md) |
+| Clarification Request | Deferral pending user input | Informational–Advisory (0–1) | 🟢 | [`patterns/refusal/clarification-request.md`](../../patterns/refusal/clarification-request.md) |
+| Human Handoff | Escalation refusal | Caution–Blocking (2–3) | 🟢 | [`patterns/refusal/human-handoff.md`](../../patterns/refusal/human-handoff.md) |
+| Policy Refusal | Policy enforcement refusal | Blocking (3) | 🟢 | [`patterns/refusal/policy-refusal.md`](../../patterns/refusal/policy-refusal.md) |
 
 ---
 
