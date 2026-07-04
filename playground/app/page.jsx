@@ -109,7 +109,7 @@ export default function PlaygroundPage() {
       </nav>
 
       {/* Main 3-panel grid */}
-      <main className="pg-main">
+      <main className="pg-main" id="pg-main-content">
         {/* Left: Primitive controls */}
         <section className="pg-panel" aria-label="Decision primitives">
           <div className="pg-panel-header">
