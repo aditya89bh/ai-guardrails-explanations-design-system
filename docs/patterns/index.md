@@ -20,14 +20,19 @@ Each pattern specification defines: what the pattern is, when it activates, how 
 
 Warning patterns surface concerns, risks, or important considerations before a user proceeds. The user retains full agency after seeing a warning.
 
-| Pattern | Sub-type | Status | File |
-|---|---|---|---|
-| Inline Warning | Inline | 🔲 | `patterns/warning/inline-warning.md` |
-| Modal Warning | Modal | 🔲 | `patterns/warning/modal-warning.md` |
-| Ambient Warning | Ambient | 🔲 | `patterns/warning/ambient-warning.md` |
-| Progressive Warning | Progressive | 🔲 | `patterns/warning/progressive-warning.md` |
-| Data Quality Warning | Inline | 🔲 | `patterns/warning/data-quality-warning.md` |
-| Output Staleness Warning | Inline / Ambient | 🔲 | `patterns/warning/staleness-warning.md` |
+| Pattern | Sub-type | Severity | Status | File |
+|---|---|---|---|---|
+| Inline Warning | Inline | Advisory (1) | 🟢 | [`patterns/warning/inline-warning.md`](../../patterns/warning/inline-warning.md) |
+| Modal Warning | Modal | Caution–Blocking (2–3) | 🟢 | [`patterns/warning/modal-warning.md`](../../patterns/warning/modal-warning.md) |
+| Ambient Warning | Ambient | Informational–Advisory (0–1) | 🟢 | [`patterns/warning/ambient-warning.md`](../../patterns/warning/ambient-warning.md) |
+| Blocking Warning | Blocking | Blocking (3) | 🟢 | [`patterns/warning/blocking-warning.md`](../../patterns/warning/blocking-warning.md) |
+| Progressive Warning | Progressive | Advisory→Blocking (1→3) | 🟢 | [`patterns/warning/progressive-warning.md`](../../patterns/warning/progressive-warning.md) |
+| Policy Warning | Policy | Advisory–Blocking (1–3) | 🟢 | [`patterns/warning/policy-warning.md`](../../patterns/warning/policy-warning.md) |
+
+**Phase 2A complete.** All six warning pattern specifications are stable. Two additional warning patterns (Data Quality Warning, Output Staleness Warning) are planned for a future phase as refinements within the inline and ambient sub-types.
+
+| Data Quality Warning | Inline | Advisory (1) | 🔲 | `patterns/warning/data-quality-warning.md` |
+| Output Staleness Warning | Inline / Ambient | Advisory (1) | 🔲 | `patterns/warning/staleness-warning.md` |
 
 ---
 
