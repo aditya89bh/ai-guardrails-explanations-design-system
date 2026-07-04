@@ -1,0 +1,163 @@
+# Developer Copilot Deployment Policy Configuration
+# Industry: Developer tools — AI code and security advisory assistant
+# Reference case study: docs/case-studies/developer-copilot.md
+# Validates against: reference/json/guardrail-policy.schema.json
+
+policyId: pol-developer-copilot-v1
+version: 1.0.0
+level: deployment
+tenantId: example-enterprise-engineering
+deploymentId: developer-copilot-ai
+industry: developer-tools
+effectiveDate: 2026-01-01
+
+# Risk thresholds — developer tools context
+# Security-related queries carry higher risk than general code assistance
+riskThresholds:
+  emergencyEscalationMin: 4       # Not applicable in developer tools — safety events only
+  roleEscalationMin: 3            # Security advisory queries escalate to security team
+  blockingWarningMin: 3
+
+# Confidence thresholds
+# Security advisories require high accuracy — CE and LC states trigger safe-refusal
+confidenceThresholds:
+  high: 0.90
+  moderate: 0.70
+  low: 0.50
+  unresolvableWindowSeconds: 300  # 5-minute CE→UR window (no safety criticality)
+  staleThresholdDays: 7           # CVE data older than 7 days is flagged stale
+
+# Permission configuration
+permissionConfig:
+  passiveDismissalEqualsDenial: true
+  delegationExpiryHours: 48
+  overrideScopePerTransaction: true
+  roleMap:
+    developer: 1
+    senior_engineer: 1
+    tech_lead: 2
+    security_engineer: 2
+    security_team_lead: 3
+    ciso: 3
+
+# Policy rules — developer copilot security advisory handling
+rules:
+  # Rule 1: CE state for security library queries → safe-refusal (no recommendation)
+  # This is the critical distinction from LC state (which allows constrained-completion)
+  - ruleId: dev-rule-01
+    description: >
+      When two sources with comparable authority make contradictory claims
+      about a security characteristic of a library (e.g., CVE applicability,
+      vulnerability presence), the copilot must issue safe-refusal.
+      No constrained recommendation is acceptable for security library selection
+      in a CE state at Risk >= 3.
+    conditions:
+      P1Min: 3
+      P2States: [conflicting]
+      P6Types: [decision-support]
+      customConditions:
+        queryType: security-library-selection
+    effect: allow
+    activatePattern: safe-refusal
+    skipPatterns: [constrained-completion, partial-completion]
+    priority: 1
+    auditLevel: detailed
+
+  # Rule 2: CE state requires reasoning-trace documenting what would resolve the conflict
+  - ruleId: dev-rule-02
+    description: >
+      All CE-state safe-refusals for security queries must include a
+      reasoning-trace that documents: (a) the contradictory claims,
+      (b) their sources, (c) what specific evidence would resolve the conflict.
+    conditions:
+      P1Min: 3
+      P2States: [conflicting]
+      P6Types: [decision-support]
+    effect: audit-only
+    activatePattern: reasoning-trace
+    priority: 2
+    auditLevel: standard
+
+  # Rule 3: Source citation at claim-level for all security advisories
+  - ruleId: dev-rule-03
+    description: >
+      All security advisory outputs must attribute claims at the individual
+      claim level, not at the response level. Source staleness (P9) must be
+      indicated per claim when the source is older than staleThresholdDays.
+    conditions:
+      P1Min: 2
+      P6Types: [decision-support]
+      customConditions:
+        queryType: security-advisory
+    effect: audit-only
+    activatePattern: source-citation
+    priority: 3
+    auditLevel: standard
+
+  # Rule 4: Internal security team advisory has higher P10 weight than upstream docs
+  - ruleId: dev-rule-04
+    description: >
+      When evaluating source reliability (P10), internal security team advisories
+      are treated as authoritative for production deployment decisions.
+      Upstream vendor documentation is medium reliability. This weighting
+      determines which source is flagged as higher authority in ConflictingEvidenceCard.
+    conditions:
+      P1Min: 2
+      customConditions:
+        sourceType: internal-security-advisory
+    effect: audit-only
+    activatePattern: source-citation   # Ensures internal advisory is attributed first
+    priority: 4
+    auditLevel: standard
+
+  # Rule 5: Redirect to security team for unresolved CE states
+  - ruleId: dev-rule-05
+    description: >
+      After safe-refusal in a CE state, always offer redirect-recovery to
+      the internal security advisory process. Do not offer role-escalation
+      (the developer does not need to hand off their session — they need
+      to go to a different process).
+    conditions:
+      P1Min: 3
+      P2States: [conflicting]
+      P6Types: [decision-support]
+      customConditions:
+        policyBlock: false
+    effect: allow
+    activatePattern: redirect-recovery
+    skipPatterns: [role-escalation, retry-recovery]
+    priority: 5
+    auditLevel: standard
+
+# Escalation configuration
+escalationConfig:
+  roleEscalationSlaHours: 24       # Security team response SLA for referred queries
+  asyncReviewSlaDays: 5
+  emergencyEscalationTargets:      # Only relevant for security incidents, not advisory queries
+    - security-operations-center
+
+# Audit requirements
+auditRequirements:
+  retentionDays: 365
+  immutable: true
+  soxCompliance: false
+  hipaaCompliance: false
+  requiredPatternAuditFields:
+    safe-refusal:
+      - patternId
+      - queryText
+      - conflictingSourceIds
+      - primitiveSnapshot
+      - timestamp
+    source-citation:
+      - patternId
+      - sourceId
+      - sourceDate
+      - claimText
+      - reliabilityScore
+      - timestamp
+
+# Accessibility requirements
+accessibilityRequirements:
+  wcagLevel: AA
+  requireReducedMotionSupport: true
