@@ -1,0 +1,162 @@
+# Healthcare AI Deployment Policy Configuration
+# Industry: Healthcare — Clinical Decision Support
+# Reference case study: docs/case-studies/healthcare-ai.md
+# Validates against: reference/json/guardrail-policy.schema.json
+
+policyId: pol-healthcare-clinical-v1
+version: 1.0.0
+level: deployment
+tenantId: example-health-system
+deploymentId: clinical-decision-support-ai
+industry: healthcare
+effectiveDate: 2026-01-01
+
+# Risk thresholds — elevated from defaults for patient safety context
+# All clinical outputs carry higher inherent risk than general enterprise AI
+riskThresholds:
+  emergencyEscalationMin: 4       # Critical patient safety events only
+  roleEscalationMin: 3            # High-risk clinical queries trigger role escalation (offered)
+  blockingWarningMin: 3           # Blocking warning on unauthorized PII access
+
+# Confidence thresholds — tighter than defaults for clinical reliability
+# Clinical AI outputs must meet a higher evidence bar before expressing confidence
+confidenceThresholds:
+  high: 0.93                      # Higher HC threshold for clinical recommendations
+  moderate: 0.75                  # Tighter MC band
+  low: 0.55                       # LC triggers at a higher score than general defaults
+  unresolvableWindowSeconds: 120  # 2-minute CE→UR window (shorter than 5-min default)
+  staleThresholdDays: 7           # Knowledge base data older than 7 days is flagged stale
+
+# Permission configuration
+permissionConfig:
+  passiveDismissalEqualsDenial: true  # Invariant — cannot be false
+  delegationExpiryHours: 24           # Clinical delegation grants expire in 24 hours
+  overrideScopePerTransaction: true
+  roleMap:
+    physician: 2
+    clinical_pharmacist: 2
+    nurse_practitioner: 2
+    registered_nurse: 2
+    clinical_pharmacology_specialist: 3
+    chief_medical_officer: 3
+
+# Policy rules — clinical-specific
+rules:
+  # Rule 1: Knowledge base freshness check for drug data
+  - ruleId: hc-rule-01
+    description: >
+      Flag all drug interaction queries when relevant knowledge base data
+      is older than staleThresholdDays. Requires stale-context disclosure
+      at detailed depth for Risk >= 3.
+    conditions:
+      P1Min: 3
+      P2States: [low, stale, conflicting]
+      P6Types: [decision-support]
+      customConditions:
+        queryType: drug-interaction
+    effect: audit-only
+    activatePattern: stale-context-state
+    priority: 1
+    auditLevel: detailed
+
+  # Rule 2: Constrained completion for clinical decision-support queries
+  - ruleId: hc-rule-02
+    description: >
+      For decision-support intent at Risk >= 3 with LC or stale confidence,
+      use constrained-completion (not safe-refusal). Clinical professionals
+      need available evidence even when it is partial.
+    conditions:
+      P1Min: 3
+      P1Max: 3
+      P2States: [low, stale]
+      P3: partial
+      P6Types: [decision-support]
+    effect: allow
+    activatePattern: constrained-completion
+    skipPatterns: [safe-refusal]
+    priority: 2
+    auditLevel: detailed
+
+  # Rule 3: Mandatory claim-level source citation for clinical outputs
+  - ruleId: hc-rule-03
+    description: >
+      All clinical queries at Risk >= 2 require claim-level source citation.
+      Each factual assertion must be attributed to its source document.
+    conditions:
+      P1Min: 2
+      P6Types: [decision-support, content-generation]
+    effect: audit-only
+    activatePattern: source-citation
+    priority: 3
+    auditLevel: standard
+
+  # Rule 4: Limitation disclosure required at detailed depth for LC + stale
+  - ruleId: hc-rule-04
+    description: >
+      When LC state and stale context compound on a clinical query,
+      limitation-disclosure must render at detailed depth, naming both
+      the confidence gap and the specific data age.
+    conditions:
+      P1Min: 3
+      P2States: [low]
+      P9: stale
+      P6Types: [decision-support]
+    effect: audit-only
+    activatePattern: limitation-disclosure
+    priority: 4
+    auditLevel: detailed
+
+  # Rule 5: Role escalation offered (not forced) for clinical queries with evidence gaps
+  - ruleId: hc-rule-05
+    description: >
+      Offer role-escalation to clinical pharmacology specialist or manufacturer
+      medical information for drug interaction queries where evidence is limited.
+      Escalation is offered but not mandatory — clinical professional makes the call.
+    conditions:
+      P1Min: 3
+      P2States: [low, stale, conflicting]
+      P6Types: [decision-support]
+      P8Min: 2
+    effect: require-escalation
+    activatePattern: role-escalation
+    priority: 5
+    auditLevel: standard
+
+# Escalation configuration
+escalationConfig:
+  roleEscalationSlaHours: null     # Offered, not mandatory — no SLA for offered escalations
+  asyncReviewSlaDays: 3            # Async review for clinical documentation requests
+  emergencyEscalationTargets:
+    - clinical-safety-officer
+    - on-call-physician-team
+
+# Audit requirements — HIPAA-scoped
+auditRequirements:
+  retentionDays: 2555              # 7 years (clinical record retention)
+  immutable: true
+  hipaaCompliance: true
+  soxCompliance: false
+  requiredPatternAuditFields:
+    source-citation:
+      - patternId
+      - claimText
+      - sourceId
+      - sourceDate
+      - timestamp
+    constrained-completion:
+      - patternId
+      - completedSections
+      - excludedSections
+      - exclusionReason
+      - timestamp
+    role-escalation:
+      - patternId
+      - escalationTarget
+      - escalationStatus
+      - clinicalContext
+      - timestamp
+
+# Accessibility requirements
+accessibilityRequirements:
+  wcagLevel: AA
+  requireReducedMotionSupport: true
