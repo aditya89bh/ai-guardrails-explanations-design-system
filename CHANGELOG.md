@@ -12,6 +12,76 @@ Work in progress across active phases.
 
 ---
 
+## Phase 6 — Developer SDK & Reference Implementation
+
+**Status:** Complete
+**Commits:** 25
+**Goal:** Turn the design system into something developers can immediately implement. This phase created machine-readable schemas, deployment configurations, reference component implementations, and complete example payloads. It introduced no new guardrail concepts — all artifacts consume the existing Pattern Library, Decision Engine, and Component Library.
+
+### Added
+
+**JSON schemas (`reference/json/`) — 4 schemas:**
+- `patterns.schema.json` — Validates guardrail pattern configuration objects. Fields: id (kebab-case), category (7 canonical categories), triggers (primitive-based activation conditions), severity (5 levels), component (maps to component names in `components/`), auditRequired, auditFields, mutuallyExclusive, compositionPrecedence, relatedPatterns. Includes two complete examples.
+- `decision-engine.schema.json` — Validates decision engine configuration. Defines structures for all ten decision primitives (P1–P10) as `$defs`, selection rules, precedence order, composition constraints, state transition maps, and audit configuration.
+- `component.schema.json` — Validates component configuration objects. Fields: id (PascalCase, matching `components/*/component-spec.md`), patternId, variants, props, states (12 canonical states), accessibilityRole (ARIA roles), ariaLive, focusBehavior (trap, initialFocus, returnFocus), designTokens (CSS custom property references), motion, responsive, auditIndicator, callbacks. BlockingWarning complete example included.
+- `guardrail-policy.schema.json` — Validates deployment policy documents. Fields: policyId, version, level (tenant/deployment), industry (11 classifications), riskThresholds, confidenceThresholds, permissionConfig, rules (ordered policy rule array), escalationConfig, auditRequirements (retentionDays, soxCompliance, hipaaCompliance, requiredPatternAuditFields), accessibilityRequirements. Finance fraud policy example included.
+
+**YAML configurations (`reference/yaml/`) — 4 configs:**
+- `healthcare-config.yaml` — Clinical AI deployment policy. Tighter confidence thresholds (HC=0.93, unresolvableWindow=120s, staleThreshold=7d). Constrained-completion preferred over safe-refusal for decision-support intent. Mandatory claim-level source citation at Risk≥2. Role escalation offered (not forced). HIPAA compliance. 7-year retention.
+- `finance-config.yaml` — Tenant-level fraud prevention. Three concurrent policy rules for international wire fraud. Emergency escalation concurrent with customer block. Redirect-only recovery (retry suppressed for blocked transactions). Customer-facing limitation disclosure to preserve trust. 7-year retention.
+- `developer-copilot-config.yaml` — CE state forces safe-refusal (not constrained-completion) for security library queries. Reasoning trace required for all CE-state refusals. Claim-level source citation with staleness indication per claim. Internal security advisory weighted as higher authority than vendor docs. Redirect to internal security process (not role escalation).
+- `industrial-ai-config.yaml` — Tenant-level safety policy. Very tight thresholds (HC=0.95, unresolvableWindow=30s, staleThreshold=0 days — real-time only). Conservative threshold policy: treat any above-threshold reading as real during UR state. Mandatory abandon-recovery after UR state. Explicit operator reset required before AI resume. Audible alert required. 10-year retention.
+
+**Configuration reference (`reference/config/`) — 5 documents:**
+- `default-policy.md` — Default values for all configurable settings (risk thresholds, confidence thresholds, permission, escalation SLAs, audit, accessibility). Override process. Precedence order. Composition rules. Values that cannot be overridden.
+- `severity-mapping.md` — Complete mapping of 5 severity levels to design tokens, ARIA roles, aria-live, focus trap, entrance duration, z-index, audit level, and behavioral rules. Severity-to-pattern mapping table (36 patterns). Progressive warning escalation table.
+- `risk-thresholds.md` — P1 risk level definitions (0–4). Pattern activation per risk level. Industry-specific risk calibration table (Healthcare, Financial, Industrial, Developer). Risk × Confidence compound outcome table.
+- `confidence-mapping.md` — All 7 P2 confidence states: definitions, thresholds, components, disclosure depth, state transition rules. CE vs LC distinction (critical for refusal type selection). State transition diagram. Industry-specific threshold recommendations.
+- `permission-mapping.md` — P4 permission states. Authority tier definitions (P8). All 6 permission pattern types with scope, expiry, and audit requirements. 6 invariant rules (cannot be overridden). Permission lifecycle state machine.
+
+**React reference implementations (`reference/react/`) — 6 components:**
+- `WarningBanner.jsx` — severity variants (informational/advisory/caution/blocking/critical), ARIA role selection, aria-live politeness, focus management on modal variants, auto-dismiss, audit callbacks on mount/acknowledge/dismiss. Three usage examples from case studies.
+- `PermissionGate.jsx` — Focus trap, deny-first Tab order (invariant), Escape=passive-dismissal=denial (invariant), overlay backdrop click=denial, delegated variant, audit callbacks for GRANTED/DENIED/PASSIVE_DISMISSAL. Focus returns to trigger element on close.
+- `ConfidenceBadge.jsx` — Seven P2 confidence states, three disclosure depths (surface/standard/detailed), stale compound indicator, source list with per-claim staleness markers, expand/collapse control with aria-expanded. Two usage examples (LC+stale healthcare, CE developer copilot).
+- `RefusalCard.jsx` — Seven refusal variants, first path-forward action receives focus on mount, "None of these" always present on alternative lists, exclusion notice never collapsed, clarification form with structured fields, human handoff button, audit callbacks. Safe-refusal CE example included.
+- `RecoveryPrompt.jsx` — Five recovery variants, override requires explicit acknowledgment checkbox (confirm button disabled until checked), redirect option list, repair form, abandon exit, audit callbacks for all state transitions. Override example from procurement case study.
+- `EmergencyEscalationOverlay.jsx` — Full keyboard capture (capture phase), Escape suppressed (no dismiss without acknowledgment), assertive aria-live, audit event fired on mount (not just on acknowledge), aggressive entrance animation with prefers-reduced-motion fallback. Industrial AI example included.
+
+**Next.js reference page (`reference/nextjs/`) — 1 file:**
+- `GuardrailDemo.jsx` — Full-pipeline demonstration: primitive input form (P1–P7) → `evaluatePrimitives()` selection engine → activated pattern list → component rendering → audit log. Preset scenario buttons for 5 case studies (healthcare, banking, insurance, developer copilot, industrial). Self-contained `evaluatePrimitives()` function documents all selection rules inline with references to `docs/decision-flows/pattern-selection-engine.md`.
+
+**Example JSON payloads (`reference/examples/`) — 4 files:**
+- `healthcare-payload.json` — Drug interaction query: LC+stale→constrained-completion+role-escalation. Complete request, primitive evaluation, engine execution (activated + skipped rules), pattern list, component sequence, output, audit record.
+- `finance-payload.json` — Fraud block: policy-refusal + concurrent emergency escalation. Three matched policy rules, customer-facing vs. internal component separation, redirect-only recovery, complete audit with transaction details.
+- `developer-copilot-payload.json` — CE state safe-refusal: conflict details per source, reasoning trace, claim-level attribution, alternatives. Skipped rules explained (CE≠LC for refusal type).
+- `industrial-ai-payload.json` — UR state emergency: state transition timeline (CE at T+0, UR at T+30s, escalation at T+252s), full sensor context, resolution record (supervisor arrived, false positive confirmed, sensor B faulted), 10-year retention.
+
+**Reference README (`reference/README.md`):**
+- Directory layout, usage instructions per artifact type, source of truth table mapping each artifact to its authoritative design system document.
+
+### Changed
+
+- `docs/index.md` — Added "I want to implement the system in code" navigation path. Reference implementations added to Documentation Status table.
+- `README.md` — Phase 6 marked complete. Implementation navigation path added for engineers. Roadmap updated (Phases 7+ renumbered). Phase 6 roadmap description added.
+- `CHANGELOG.md` — This entry.
+
+### Key design decisions
+
+1. **Schemas validate, not duplicate.** The JSON schemas validate configuration objects against the existing taxonomy and specification names. They do not contain specification content — they reference it via `specRef` and use enumerated values derived from the canonical taxonomy.
+2. **YAML configurations override defaults, not replace them.** Each industry config only specifies values that differ from the default policy. This makes the delta between industry contexts legible and the default-policy.md a stable reference.
+3. **React examples are reference implementations, not production components.** They demonstrate props, states, accessibility, tokens, and design decisions. They are not optimized for performance, bundle size, or TypeScript. Teams should adapt them to their framework conventions.
+4. **The Next.js demo page implements the selection engine in code.** `evaluatePrimitives()` is a simplified but functionally complete implementation of `docs/decision-flows/pattern-selection-engine.md`. It is not a stub — it produces different component sets for different primitive combinations. It can serve as a starting point for an internal guardrail testing tool.
+5. **Example payloads include resolution records.** The industrial-ai-payload.json includes the full resolution: supervisor arrived at T+7m34s, thermocouple lead found loose, false positive confirmed. This demonstrates the audit trail continues after the AI's involvement ends.
+
+### Known gaps
+
+- Schemas are JSON Schema draft 2020-12 — validation tooling compatibility should be verified for your environment.
+- React examples use plain JSX without TypeScript. TypeScript type definitions are not included.
+- The `evaluatePrimitives()` selection engine in GuardrailDemo.jsx is simplified. It implements the primary selection rules but not all composition and precedence engine nuances.
+- No test files or schema validation test suite included — planned for Phase 9.
+
+---
+
 ## Phase 5 — Reference Implementations & Case Studies
 
 **Status:** Complete
