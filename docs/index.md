@@ -36,12 +36,14 @@ Specifications for every guardrail pattern, explanation pattern, permission gate
 - Recovery flows
 
 ### [Decision Flows](decision-flows/index.md)
-Structured logic trees and flowcharts for determining when a pattern applies, which variant to use, and how patterns chain together.
+The guardrail decision engine: structured rules for selecting, ordering, combining, and transitioning between the 36 pattern specifications. The Phase 3 engine is the operative logic layer of the design system.
 
-- When to trigger each pattern
-- Severity determination logic
-- Pattern chaining and composition
-- Edge case handling
+- Decision primitives — the ten input variables every rule depends on
+- Pattern selection engine — how the system maps context to specific patterns
+- Pattern precedence engine — conflict resolution and ordering rules
+- State transition engine — state machines for uncertainty, refusal, escalation, and recovery
+- Pattern composition engine — legal and illegal pattern combinations
+- Orchestration engine — complete end-to-end examples (healthcare, finance, enterprise, developer, industrial)
 
 ### [Enterprise Playbooks](enterprise-playbooks/index.md)
 Deployment guidance for enterprise teams implementing this design system at scale. Covers governance, policy configuration, audit requirements, and organizational rollout.
@@ -76,7 +78,7 @@ Reference implementations across common enterprise AI product types. Annotated w
 → [Principles](principles/index.md) → [Taxonomy](taxonomy/index.md) → [Patterns](patterns/index.md)
 
 ### I am an engineer
-→ [Patterns](patterns/index.md) → [`/patterns`](../patterns/README.md) → [`/components`](../components/README.md) → [`/examples`](../examples/README.md)
+→ [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md) → [`/patterns`](../patterns/README.md) → [`/components`](../components/README.md) → [`/examples`](../examples/README.md)
 
 ### I am a compliance or trust & safety lead
 → [Enterprise Playbooks](enterprise-playbooks/index.md) → [Regulated Industries](regulated-industries/index.md)
@@ -93,7 +95,7 @@ Reference implementations across common enterprise AI product types. Annotated w
 | Principles | Phase 1 | Scaffold |
 | Taxonomy | Phase 1 | Scaffold |
 | Patterns | Phase 1–2 | Scaffold → Full specs in Phase 2 |
-| Decision Flows | Phase 1, 3 | Scaffold → Logic trees in Phase 3 |
+| Decision Flows | Phase 1, 3 | ✅ Complete — decision engine (6 documents, stable) |
 | Enterprise Playbooks | Phase 1, 5 | Scaffold → Full guidance in Phase 5 |
 | Regulated Industries | Phase 1, 6 | Scaffold → Domain specs in Phase 6 |
 | Case Studies | Phase 1, 7 | Scaffold → Full studies in Phase 7 |
