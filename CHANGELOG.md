@@ -12,6 +12,93 @@ Work in progress across active phases.
 
 ---
 
+## Phase 9 — Release Engineering, Validation & v1.0.0
+
+**Status:** Complete
+**Commits:** 25
+**Goal:** Finalize the repository for its v1.0.0 release. Focus exclusively on production readiness, validation, release engineering, automated testing, CI improvements, playground polish, and visual documentation. No new guardrail concepts, no taxonomy changes, no decision engine changes.
+
+### Added
+
+**Release Engineering**
+- `RELEASE.md` — Release process guide: 3 release types (patch/minor/major), cadence policy, 7-step release process, hotfix process, v1.0.0 scope definition with included/excluded content.
+- `VERSIONING.md` — SemVer policy with documentation-specific interpretations: breaking changes taxonomy, taxonomy lock guarantee, schema stability contract, pre-release identifiers, version history table.
+- `RELEASE_CHECKLIST.md` — 40-point pre-release checklist: tests, CI, playground verification (all 5 scenarios), documentation, schema integrity, pattern/component coverage, repository hygiene, GitHub configuration, tagging, post-release steps.
+- `RELEASE_NOTES.md` — Complete v1.0.0 release notes with scope summary, component inventory, known limitations, upgrade path (first release — no upgrade needed), and known post-v1.0.0 opportunities.
+
+**Support Lifecycle**
+- `SUPPORT.md` — Added support lifecycle table (v1.0.x active support, pre-release unsupported), active support definition, deprecation policy (one major version minimum notice), explicit v1.0.0 deprecation-free guarantee.
+
+**Automated Test Suite (`tests/`)**
+- `tests/package.json` — Node.js 18+ test runner configuration, 5 test scripts.
+- `tests/README.md` — Test suite documentation with run instructions and suite table.
+- `tests/engine/engine.test.js` — 34 tests: default state, R01 (policy block), R02 (UR+Critical), R07 (LC+decision-support), R08 (LC+action-execution), R05 (CE+high-risk), composition constraints, all 5 scenarios, result structure integrity.
+- `tests/schemas/schema.test.js` — 21 tests: all 4 schemas valid JSON, $schema/title/structure fields, shared conventions.
+- `tests/payloads/payload.test.js` — 16 tests: all 4 payloads valid JSON, non-empty, content records present, file size sanity.
+- `tests/yaml/yaml.test.js` — 20 tests: all 4 configs parse, required keys, industry-specific content, key count sanity.
+- `tests/smoke/smoke.test.js` — 74 tests: 11 root health files, 11 Phase 8 docs, 14 reference artifacts, 5 engine files, 2 data files, 14 components, 4 CI workflows, 3 GitHub templates, 6 accessibility marker tests (skip-link, aria-live, role=tablist/tab, aria-selected, aria-modal), 3 attribution scan tests.
+
+**Total tests: 165, 0 failures.**
+
+**Visual Documentation (`docs/visuals/`)**
+- `docs/visuals/README.md` — Directory index with file listing.
+- `docs/visuals/architecture-overview.md` — Text-art diagrams: 6-layer system stack, decision engine pipeline, deployment architecture, complete repository map.
+- `docs/visuals/playground-walkthrough.md` — Annotated screen layout (ASCII), 5-panel descriptions, keyboard shortcuts table, screenshot capture guide (3 detailed guides for recommended screenshots).
+- `docs/visuals/screenshot-placeholders.md` — Specifications for 7 screenshots + 1 animated GIF (deferred until stable deployment URL).
+
+### Improved
+
+**CI Workflows**
+- `playground-build.yml` — Added component file verification (11 files), ErrorBoundary presence check, smoke test runner step.
+- `markdown-lint.yml` — Upgraded to `markdownlint-cli2`, added `markdownlint.json` config reference, file count reporting.
+- `schema-validation.yml` — Added YAML validation step (pyyaml), full test suite integration (schemas + payloads + YAML).
+- `link-check.yml` — Added 301/302 alive codes, quiet mode, total file count reporting, improved config.
+- `smoke-tests.yml` — New workflow running all 5 test suites on every push to main.
+
+**Playground**
+- `layout.jsx` — Improved metadata (keywords, description), `viewport` export, removed redundant skip-link from layout (now in page.jsx), `data-theme="dark"` default on `<html>`.
+- `page.jsx` — Welcome state on first load showing all 5 scenarios as quick-launch buttons. Welcome dismissal on primitive change, scenario load, or reset. Reset restores Welcome state.
+- `globals.css` — Welcome state styles (pg-welcome, pg-welcome-scenarios, pg-welcome-scenario-btn, pg-welcome-scenario-key, pg-welcome-hint). Mobile improvements: `100svh`, `-webkit-overflow-scrolling: touch`, pointer:coarse touch targets (44px min-height), hidden header stat on mobile, tab overflow scroll, 480px breakpoint improvements.
+
+**Bug Fix**
+- `playground/components/guardrail/PermissionGate.jsx` — Added `aria-modal="true"` to the `role="alertdialog"` container (required for AT to correctly scope the dialog).
+
+**README**
+- Added v1.0.0 version badge, tests badge (165 passing), CI badge (5 workflows).
+- Added Release Status section with links to RELEASE_NOTES.md and VERSIONING.md.
+- Added Testing section with npm test command.
+- Updated phase status table to include Phase 9 as complete.
+- Added GitHub Issues/Discussions links.
+
+### Design Decisions (Phase 9)
+
+**Welcome state vs. empty state**
+The welcome state (shown on first load and after Reset) provides immediate orientation and quick access to all 5 scenarios without the user needing to find the scenario bar. It is dismissed on any interaction, so it never interrupts the workflow.
+
+**Tests use Node.js built-in test runner**
+No external test framework (Jest, Vitest, Mocha) is required. Node.js 18+ includes `node --test` with full `describe`/`it`/`assert` support. This keeps the test suite dependency-free except for `ajv` and `js-yaml`, which are already used in validation scripts.
+
+**Screenshot capture is deferred**
+Capturing screenshots from a local development server would produce OS-specific artifacts. The placeholder specifications are detailed enough for any contributor to produce consistent screenshots once the playground is deployed to a stable URL.
+
+**165 tests as validation backbone**
+The test suite validates the decision engine behavior, schema integrity, YAML config correctness, and repository structure. This provides a reliable regression check for future contributions and is a required pass condition in `RELEASE_CHECKLIST.md`.
+
+### Validation Results (Phase 9)
+
+- **Test suite:** 165 tests, 0 failures, 5 suites
+- **Terminology scan:** CLEAN
+- **Attribution scan:** CLEAN
+- **Citation scan:** CLEAN
+- **JSON schema validation:** CLEAN (4/4)
+- **Example payload validation:** CLEAN (4/4)
+- **YAML config validation:** CLEAN (4/4)
+- **Playground build:** CLEAN (npm run build)
+- **CI workflows:** 5 workflows present and syntactically valid
+- **Markdown files:** 155+ files
+
+---
+
 ## Phase 8 — Production Hardening & Open Source Release
 
 **Status:** Complete
