@@ -12,6 +12,54 @@ Work in progress across active phases.
 
 ---
 
+## Phase 2E — Refusal State Specifications
+
+**Status:** Complete
+**Commits:** 7
+**Goal:** Deliver complete, stable specifications for all seven refusal state variants — treating refusals as interaction strategies with defined completion paths, not as generic rejection messages.
+
+### Added
+
+- `patterns/refusal/safe-refusal.md` — Complete, unconditional refusal for safety/harm risks. Defines when a refusal has no completion path, how to frame the refusal without accusation, and the requirement for false-positive reporting mechanisms. Enforces non-accusatory, specific messaging over vague blocking copy.
+- `patterns/refusal/partial-completion.md` — Graceful degradation: complete fulfillable portions, explicitly decline unfulfillable ones. Requires visible completeness markers in the output, not just a note in the explanation. Defines silent exclusion as a critical failure mode.
+- `patterns/refusal/constrained-completion.md` — Modified fulfillment: complete the request with disclosed constraints applied. Distinguishes from partial completion by delivering a whole output (modified) rather than a partial one (excluded sections). Silent constraint is the primary failure mode and is prohibited.
+- `patterns/refusal/alternative-suggestion.md` — Capability refusal with redirection: decline the specific form, offer alternatives for the underlying goal. Defines the distinction between refusing a goal (safe refusal) and refusing a form (alternative suggestion). Limits alternatives to three or four to prevent decision paralysis.
+- `patterns/refusal/clarification-request.md` — Deferral pending user input. Defines when to ask versus when to assume and proceed. Treats repeated clarification and over-clarification as failure modes. Requires targeted single-focus questions over open-ended requests for "more detail."
+- `patterns/refusal/human-handoff.md` — Escalation refusal routing to a human agent with context transfer. Defines three handoff types: capability, policy, and quality. Requires context summary transfer — handoff without context is treated as abandonment. Covers distress and crisis escalation scenarios.
+- `patterns/refusal/policy-refusal.md` — Rule-governed refusal: consistent enforcement of configured policies across all users and sessions. Distinguishes from safe refusal (judgment-governed) by its rule-governed, non-judgment nature. Requires specific policy citation, authorized path to resolution, and policy consistency audit requirements.
+
+### Changed
+
+- `docs/taxonomy/index.md` — Refusal state variants expanded from 5 generic sub-types to 7 lifecycle-based interaction strategies aligned to the new specifications. Added descriptions for each variant.
+- `docs/patterns/index.md` — Refusal state table updated to reflect 7 stable specifications with severity columns and direct file links.
+- `patterns/README.md` — Refusal directory entry updated with descriptions for each new specification. Phase 2E status added.
+
+---
+
+## Phase 2D — Uncertainty State Specifications
+
+**Status:** Complete
+**Commits:** 7
+**Goal:** Deliver complete, stable specifications for all seven uncertainty states — treating them as internal AI operating states that determine permitted actions and user interaction strategy, not just as UI disclosures.
+
+### Added
+
+- `patterns/uncertainty/high-confidence-state.md` — Baseline operating state. Defines when passive confidence indicators are appropriate, what actions are permitted without additional friction, and forbidden actions (including treating high confidence as authorization for irreversible actions). Establishes that the absence of uncertainty disclosure is the signal.
+- `patterns/uncertainty/moderate-confidence-state.md` — Advisory operating state. Defines two-directional exit (up to high confidence, down to low) and distinguishes advisory-level disclosure from caution-level. Specifies that moderate confidence does not lower permission gate bars for high-stakes actions — it may raise them.
+- `patterns/uncertainty/low-confidence-state.md` — Caution operating state. Defines the distinction between low confidence (poor data quality) and insufficient information (data absence). Requires output to break the user's default assumption of reliability. Mandates modal warning before any consequential action.
+- `patterns/uncertainty/conflicting-evidence-state.md` — Source contradiction state. Qualitatively different from confidence-based states: individual sources may be high quality, but they disagree. Requires both versions of a claim to be surfaced with attribution. Defines citation hallucination (silently selecting one source) as the primary forbidden action.
+- `patterns/uncertainty/insufficient-information-state.md` — Information absence state. Distinguishes from low confidence (quality) by root cause: the data is not poor, it is absent. Primary resolution is clarification request. Defines fabrication to fill the gap as the highest-severity failure mode.
+- `patterns/uncertainty/stale-context-state.md` — Temporal reliability state. Defines staleness as a domain-sensitive modifier on confidence: different output types have different freshness thresholds. Introduces the stable/dynamic element partition: stable elements can still be delivered; dynamic elements require external verification.
+- `patterns/uncertainty/unresolvable-state.md` — Terminal state. The only uncertainty state that does not exit to a lower-confidence state — only to refusal, escalation, or task reframing. Defines three forbidden actions: silent failure, output with disclosure (explicitly insufficient in this state), and reversal without surfacing the reversal. Every unresolvable state response must include a specific forward path.
+
+### Changed
+
+- `docs/taxonomy/index.md` — Uncertainty state variants expanded from 4 minimal entries to 7 complete sub-types with definition rows. Added four new trigger condition vocabulary entries: source conflict, freshness threshold breach, information absence, and unresolvable uncertainty. Added contextual descriptions for both uncertainty and refusal variant tables.
+- `docs/patterns/index.md` — Uncertainty state table updated to reflect 7 stable specifications with severity columns and direct file links.
+- `patterns/README.md` — Uncertainty directory entry updated with descriptions for each new specification. Phase 2D status added.
+
+---
+
 ## Phase 2B — Explanation Pattern Specifications
 
 **Status:** Complete
