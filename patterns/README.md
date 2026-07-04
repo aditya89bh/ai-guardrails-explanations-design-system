@@ -11,13 +11,15 @@ These are the authoritative specifications for pattern behavior. They are the so
 ```
 patterns/
 ├── README.md                        # This file
-├── warning/                         # Warning pattern specifications
-│   ├── inline-warning.md
-│   ├── modal-warning.md
-│   ├── ambient-warning.md
-│   ├── progressive-warning.md
-│   ├── data-quality-warning.md
-│   └── staleness-warning.md
+├── warning/                         # Warning pattern specifications  [Phase 2A — 6 specs stable]
+│   ├── inline-warning.md            # Advisory inline warning
+│   ├── modal-warning.md             # Caution–Blocking modal warning
+│   ├── ambient-warning.md           # Informational–Advisory ambient warning
+│   ├── blocking-warning.md          # Blocking warning (hard stop, requires resolution)
+│   ├── progressive-warning.md       # Escalating multi-stage warning
+│   ├── policy-warning.md            # Policy-rule-triggered warning
+│   ├── data-quality-warning.md      # [Planned — future phase]
+│   └── staleness-warning.md         # [Planned — future phase]
 ├── explanation/                     # Explanation pattern specifications
 │   ├── confidence-disclosure.md
 │   ├── source-citation.md
@@ -148,4 +150,12 @@ Links to case studies or examples that demonstrate this pattern in context.
 ## Phase Status
 
 - **Phase 1:** Directory structure, README, and format specification only
-- **Phase 2:** Full specifications for all ~38 patterns across all seven categories
+- **Phase 2A:** Warning pattern category — 6 specifications complete and stable
+  - `inline-warning.md` ✅
+  - `modal-warning.md` ✅
+  - `ambient-warning.md` ✅
+  - `blocking-warning.md` ✅
+  - `progressive-warning.md` ✅
+  - `policy-warning.md` ✅
+- **Phase 2B–2G:** Explanation patterns, permission gates, uncertainty states, refusal states, escalation paths, and recovery flows — planned
+- **Phase 2 target:** Full specifications for all ~38 patterns across all seven categories
