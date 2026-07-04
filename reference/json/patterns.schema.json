@@ -1,0 +1,243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://guardrails.design/schemas/patterns.schema.json",
+  "title": "GuardrailPattern",
+  "description": "Schema for a guardrail pattern configuration object. Validates pattern specifications consumed by the decision engine. Terminology follows docs/taxonomy/index.md.",
+  "type": "object",
+  "required": ["id", "category", "name", "triggers", "severity"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z]+)*$",
+      "description": "Kebab-case pattern identifier. Must match the filename of the pattern spec in patterns/.",
+      "examples": [
+        "inline-warning",
+        "blocking-warning",
+        "policy-refusal",
+        "low-confidence-state",
+        "human-handoff",
+        "retry-recovery"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "warning",
+        "explanation",
+        "permission",
+        "uncertainty",
+        "refusal",
+        "escalation",
+        "recovery"
+      ],
+      "description": "The canonical pattern category. One of the seven categories defined in docs/taxonomy/index.md."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable pattern name. Used in audit logs and UI labels."
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Optional subcategory for patterns that have named variants (e.g., 'blocking' for blocking-warning)."
+    },
+    "triggers": {
+      "type": "object",
+      "description": "Primitive-based activation conditions. All specified conditions must be met simultaneously (AND logic).",
+      "properties": {
+        "riskMin": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4,
+          "description": "Minimum P1 risk score (inclusive) required to activate this pattern."
+        },
+        "riskMax": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4,
+          "description": "Maximum P1 risk score (inclusive). Omit to allow any risk level."
+        },
+        "confidenceStates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "high",
+              "moderate",
+              "low",
+              "conflicting",
+              "insufficient",
+              "stale",
+              "unresolvable"
+            ]
+          },
+          "description": "P2 confidence states that activate this pattern. Empty array means any confidence state."
+        },
+        "policyMatch": {
+          "type": "string",
+          "enum": ["any", "tenant", "deployment", "none"],
+          "description": "Required P5 policy match level. 'any' means any match level triggers. 'none' means no policy match required.",
+          "default": "none"
+        },
+        "permissionStatus": {
+          "type": "string",
+          "enum": ["authorized", "unauthorized", "partial", "any"],
+          "description": "Required P4 permission state.",
+          "default": "any"
+        },
+        "intentTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "decision-support",
+              "action-execution",
+              "content-generation",
+              "workflow-automation",
+              "any"
+            ]
+          },
+          "description": "P6 user intent types that activate this pattern."
+        },
+        "capabilityRequired": {
+          "type": "string",
+          "enum": ["capable", "incapable", "partial", "any"],
+          "description": "Required P3 capability state.",
+          "default": "any"
+        }
+      },
+      "additionalProperties": false
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "informational",
+        "advisory",
+        "caution",
+        "blocking",
+        "critical"
+      ],
+      "description": "Default severity level. Maps to design tokens in components/design-tokens.md. Can be overridden per deployment."
+    },
+    "severityOverrides": {
+      "type": "object",
+      "description": "Conditional severity overrides keyed by primitive condition strings.",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["informational", "advisory", "caution", "blocking", "critical"]
+      }
+    },
+    "component": {
+      "type": "string",
+      "description": "Primary UI component name that implements this pattern. Must match a component defined in components/.",
+      "examples": [
+        "WarningBanner",
+        "BlockingWarning",
+        "PolicyWarning",
+        "ModalWarning",
+        "ConfidenceBadge",
+        "LimitationDisclosure",
+        "SourceList",
+        "ReasoningTrace",
+        "ScopedPermissionGate",
+        "DelegatedPermissionRequest",
+        "UncertaintyIndicator",
+        "ConflictingEvidenceCard",
+        "UnresolvableStateCard",
+        "RefusalCard",
+        "ConstrainedCompletionCard",
+        "AlternativeSuggestionCard",
+        "HumanHandoffCard",
+        "RoleEscalationCard",
+        "EmergencyEscalationOverlay",
+        "AsyncReviewStatus",
+        "RetryPrompt",
+        "RedirectSuggestion",
+        "RepairCard",
+        "OverrideConfirmation",
+        "AbandonExit"
+      ]
+    },
+    "auditRequired": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether activation of this pattern must generate an audit event."
+    },
+    "auditFields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Required fields in the audit event when this pattern activates.",
+      "examples": [
+        ["patternId", "primitiveSnapshot", "componentRendered", "timestamp"],
+        ["patternId", "policyRuleId", "primitiveSnapshot", "transactionId", "timestamp"]
+      ]
+    },
+    "mutuallyExclusive": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Pattern IDs that cannot be active simultaneously with this pattern. Enforced by the composition engine."
+    },
+    "compositionPrecedence": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Relative activation precedence within the pattern's category. Lower number = higher precedence. Used by the precedence engine when multiple patterns in the same category activate."
+    },
+    "relatedPatterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Pattern IDs that commonly activate alongside or sequentially after this pattern."
+    },
+    "specRef": {
+      "type": "string",
+      "description": "Relative path to the authoritative pattern specification file.",
+      "examples": [
+        "patterns/warning/blocking-warning.md",
+        "patterns/refusal/policy-refusal.md"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "blocking-warning",
+      "category": "warning",
+      "name": "Blocking Warning",
+      "subcategory": "blocking",
+      "triggers": {
+        "riskMin": 3,
+        "policyMatch": "any",
+        "permissionStatus": "unauthorized"
+      },
+      "severity": "blocking",
+      "component": "BlockingWarning",
+      "auditRequired": true,
+      "auditFields": ["patternId", "primitiveSnapshot", "policyRuleId", "componentRendered", "timestamp"],
+      "mutuallyExclusive": ["inline-warning", "ambient-warning"],
+      "compositionPrecedence": 1,
+      "relatedPatterns": ["policy-warning", "policy-refusal", "scoped-permission"],
+      "specRef": "patterns/warning/blocking-warning.md"
+    },
+    {
+      "id": "low-confidence-state",
+      "category": "uncertainty",
+      "name": "Low Confidence State",
+      "triggers": {
+        "confidenceStates": ["low"]
+      },
+      "severity": "advisory",
+      "component": "UncertaintyIndicator",
+      "auditRequired": true,
+      "auditFields": ["patternId", "primitiveSnapshot", "confidenceScore", "timestamp"],
+      "mutuallyExclusive": ["high-confidence-state"],
+      "compositionPrecedence": 3,
+      "relatedPatterns": ["confidence-disclosure", "constrained-completion", "clarification-request"],
+      "specRef": "patterns/uncertainty/low-confidence-state.md"
+    }
+  ]
+}
