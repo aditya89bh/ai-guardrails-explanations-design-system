@@ -67,7 +67,20 @@ ai-guardrails-explanations-design-system/
 ├── patterns/                        # Machine-readable pattern definitions
 ├── components/                      # UI component specifications
 ├── examples/                        # Annotated implementation examples
-└── templates/                       # Reusable starting-point templates
+├── templates/                       # Reusable starting-point templates
+├── reference/                       # Machine-readable artifacts (schemas, YAML, React examples)
+│   ├── json/                        # 4 JSON schemas (patterns, engine, component, policy)
+│   ├── yaml/                        # Industry-specific deployment configurations
+│   ├── config/                      # Reference configuration documents
+│   ├── react/                       # React component reference implementations
+│   ├── nextjs/                      # Next.js full-pipeline demo
+│   └── examples/                    # Complete JSON example payloads
+│
+└── playground/                      # Interactive Decision Engine Playground (Phase 7)
+    ├── app/                         # Next.js App Router pages and global styles
+    ├── components/                  # Playground UI components + guardrail renderers
+    ├── engine/                      # Decision engine (primitives, rules, evaluator, bridges)
+    └── data/                        # Pattern registry and scenario definitions
 ```
 
 ---
@@ -91,6 +104,9 @@ Start with [`docs/case-studies/`](docs/case-studies/) to find the closest refere
 ### Engineers implementing the system
 Start with [`reference/`](reference/README.md) for machine-readable schemas, deployment YAML configurations, React component examples, and example JSON payloads. Copy the closest YAML config and validate against the JSON schemas.
 
+### Anyone who wants to see the engine in action
+Open the [`playground/`](playground/README.md) — a live Next.js app that lets you manipulate decision primitives and observe the resulting patterns, components, and audit trail in real time. Run `cd playground && npm install && npm run dev`.
+
 ### New contributors
 Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review the taxonomy in [`docs/taxonomy/`](docs/taxonomy/) before adding new patterns.
 
@@ -106,10 +122,11 @@ Read [`CONTRIBUTING.md`](CONTRIBUTING.md) for the contribution process. Review t
 | **Phase 4** | AI Component Library | ✅ Complete — 47 component documents across 7 categories | ~21 commits |
 | **Phase 5** | Reference Implementations & Case Studies | ✅ Complete — 8 case studies across 8 industries + comparison matrix | ~15 commits |
 | **Phase 6** | Developer SDK & Reference Implementation | ✅ Complete — 4 JSON schemas, 4 YAML configs, 6 React examples, Next.js demo, 4 JSON payloads | ~25 commits |
-| Phase 7 | Enterprise Playbooks | Planned | ~40 commits |
-| Phase 8 | Regulated Industries | Planned | ~40 commits |
-| Phase 9 | Extended Case Studies & Templates | Planned | ~30 commits |
-| Phase 9 | Review, Polish, and Release | Planned | ~20 commits |
+| **Phase 7** | Interactive Playground & Validation | ✅ Complete — Next.js playground, 14-rule engine, 5 scenarios, 5 visualization tabs, full component rendering | ~23 commits |
+| Phase 8 | Enterprise Playbooks | Planned | ~40 commits |
+| Phase 9 | Regulated Industries | Planned | ~40 commits |
+| Phase 10 | Extended Case Studies & Templates | Planned | ~30 commits |
+| Phase 11 | Review, Polish, and Release | Planned | ~20 commits |
 | **Total** | | | **~350 commits** |
 
 ---
@@ -137,16 +154,19 @@ Machine-readable artifacts for teams implementing the design system in code. Inc
 ### Phase 5 — Reference Implementations & Case Studies (~15 commits) — Complete
 Eight end-to-end case studies across healthcare, financial services, insurance, enterprise HR, customer support, developer tools, manufacturing, and procurement. Each case study demonstrates the full decision engine → pattern selection → component activation → user journey → audit trail → recovery flow pipeline. Includes a cross-industry comparison matrix covering risk, pattern coverage, escalation paths, recovery flows, audit levels, and accessibility.
 
-### Phase 6 — Enterprise Playbooks (~40 commits)
+### Phase 7 — Interactive Playground & Validation (~23 commits) — Complete
+An interactive Next.js application demonstrating the full decision engine pipeline. Features: editable P1–P10 primitive controls, rule evaluation visualization (14 selection rules), pattern activation display, real component rendering (all 7 guardrail categories), P2 state machine visualization, pattern composition layer, 5 industry scenarios (healthcare, finance, developer copilot, industrial AI, customer support), chronological audit trail, responsive layout, and WCAG 2.1 AA accessibility. Run: `cd playground && npm install && npm run dev`.
+
+### Phase 8 — Enterprise Playbooks (~40 commits)
 Deployment guidance for enterprise AI teams. Covers: policy configuration, audit trail requirements, multi-tenant considerations, localization, and organizational rollout.
 
-### Phase 7 — Regulated Industries (~40 commits)
+### Phase 9 — Regulated Industries (~40 commits)
 Domain-specific pattern variants for healthcare, financial services, legal, government, and critical infrastructure. Covers compliance requirements that affect pattern behavior.
 
-### Phase 8 — Extended Case Studies & Templates (~30 commits)
+### Phase 10 — Extended Case Studies & Templates (~30 commits)
 Reusable pattern templates, decision-flow templates, and tooling for teams adopting the design system.
 
-### Phase 9 — Review, Polish, and Release (~20 commits)
+### Phase 11 — Review, Polish, and Release (~20 commits)
 Cross-reference audit, broken link checks, terminology consistency review, final changelog, and release tagging.
 
 ---
