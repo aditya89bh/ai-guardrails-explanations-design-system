@@ -14,28 +14,36 @@ Work in progress across active phases.
 
 ## Phase 1 — Foundation
 
-**Status:** In Progress
-**Target commits:** ~20
+**Status:** Complete
+**Commits:** 20
 **Goal:** Establish the documentation-first foundation, define repo structure, taxonomy, and contribution standards.
 
 ### Added
-- Repository initialized with `.gitignore` and folder scaffold
+- Repository initialized with `.gitignore` and full subdirectory scaffold
 - MIT license
-- `README.md` with full project overview, pattern categories, repo structure, usage guide, phase status, and roadmap
-- `CHANGELOG.md` (this file)
-- `CONTRIBUTING.md` with contribution standards and review process
-- `docs/index.md` — documentation hub and navigation
-- `docs/principles/index.md` — core design principles
-- `docs/taxonomy/index.md` — guardrail and explanation taxonomy
-- `docs/patterns/index.md` — pattern library overview
-- `docs/decision-flows/index.md` — decision flow index
-- `docs/enterprise-playbooks/index.md` — enterprise deployment playbook index
-- `docs/regulated-industries/index.md` — regulated industries guidance index
-- `docs/case-studies/index.md` — case studies index
-- `patterns/README.md` — machine-readable pattern definitions guide
-- `components/README.md` — UI component specifications guide
-- `examples/README.md` — annotated examples guide
-- `templates/README.md` — reusable templates guide
+- `README.md` — full project overview, pattern categories, repo structure, usage guide, phase status, and roadmap to ~350 commits
+- `CHANGELOG.md` — phase-based versioning log
+- `CONTRIBUTING.md` — contribution standards, commit format, pattern specification format, and canonical terminology requirements
+- `docs/index.md` — documentation hub with navigation and role-based quick access
+- `docs/principles/index.md` — 10 core design principles with enterprise standards and implementation checklist
+- `docs/taxonomy/index.md` — full guardrail taxonomy: 7 pattern categories, 5 severity levels, sub-types for all categories, trigger condition vocabulary, and canonical terminology reference
+- `docs/patterns/index.md` — complete pattern library index with 38 planned specifications across all 7 categories
+- `docs/decision-flows/index.md` — decision flow index with ~20 planned flows including cross-pattern composition flows
+- `docs/enterprise-playbooks/index.md` — playbook index covering policy, audit, multi-tenant, rollout, and localization
+- `docs/regulated-industries/index.md` — regulated industries index covering healthcare, financial services, legal, government, and critical infrastructure
+- `docs/case-studies/index.md` — case study index with 15 planned studies across 4 product types, plus case study format template
+- `patterns/README.md` — pattern library guide with directory structure and specification format
+- `components/README.md` — component specifications guide with directory structure, format, and accessibility baseline
+- `examples/README.md` — annotated examples guide with format and annotation conventions
+- `templates/README.md` — templates guide with 7 available templates
+- `templates/pattern-specification.md` — pattern specification starter template
+- `templates/decision-flow.md` — decision flow starter template
+- `templates/case-study.md` — case study starter template
+- `templates/enterprise-playbook.md` — enterprise playbook starter template
+- `templates/regulated-industry-document.md` — regulated industry document starter template
+- `templates/example.md` — annotated example starter template
+- `templates/component-specification.md` — component specification starter template
+- Full subdirectory scaffold with `.gitkeep` files across all `patterns/`, `components/`, `examples/`, and `docs/` subdirectories
 
 ---
 
