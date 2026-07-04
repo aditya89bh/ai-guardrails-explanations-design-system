@@ -1,0 +1,381 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://guardrails.design/schemas/decision-engine.schema.json",
+  "title": "GuardrailDecisionEngineConfig",
+  "description": "Schema for a guardrail decision engine configuration. Encodes the selection rules, precedence rules, composition constraints, and state machine transitions that govern pattern activation. Consumes the ten decision primitives defined in docs/decision-flows/decision-primitives.md.",
+  "type": "object",
+  "required": ["version", "primitives", "selectionRules", "compositionConstraints"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this engine configuration.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "deploymentId": {
+      "type": "string",
+      "description": "Unique identifier for the deployment this configuration governs."
+    },
+    "primitives": {
+      "type": "object",
+      "description": "Configuration for the ten decision primitives (P1–P10). Each primitive defines how its value is computed or accepted.",
+      "required": ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10"],
+      "properties": {
+        "P1": {
+          "$ref": "#/$defs/RiskPrimitive"
+        },
+        "P2": {
+          "$ref": "#/$defs/ConfidencePrimitive"
+        },
+        "P3": {
+          "$ref": "#/$defs/CapabilityPrimitive"
+        },
+        "P4": {
+          "$ref": "#/$defs/PermissionPrimitive"
+        },
+        "P5": {
+          "$ref": "#/$defs/PolicyPrimitive"
+        },
+        "P6": {
+          "$ref": "#/$defs/IntentPrimitive"
+        },
+        "P7": {
+          "$ref": "#/$defs/BusinessImpactPrimitive"
+        },
+        "P8": {
+          "$ref": "#/$defs/AuthorityPrimitive"
+        },
+        "P9": {
+          "$ref": "#/$defs/ContextFreshnessPrimitive"
+        },
+        "P10": {
+          "$ref": "#/$defs/SourceReliabilityPrimitive"
+        }
+      },
+      "additionalProperties": false
+    },
+    "selectionRules": {
+      "type": "array",
+      "description": "Ordered list of pattern selection rules. Rules are evaluated in order. First matching rule wins unless combineAll is true.",
+      "items": {
+        "$ref": "#/$defs/SelectionRule"
+      }
+    },
+    "precedenceOrder": {
+      "type": "array",
+      "description": "Inter-category precedence order, highest to lowest. Determines which category's pattern renders first when multiple categories activate simultaneously.",
+      "items": {
+        "type": "string",
+        "enum": ["policy-refusal", "safe-refusal", "blocking-warning", "emergency-escalation", "permission", "explanation", "uncertainty", "recovery"]
+      },
+      "default": [
+        "policy-refusal",
+        "safe-refusal",
+        "blocking-warning",
+        "emergency-escalation",
+        "permission",
+        "explanation",
+        "uncertainty",
+        "recovery"
+      ]
+    },
+    "compositionConstraints": {
+      "type": "object",
+      "description": "Rules for legal and illegal pattern combinations. Enforced by the composition engine.",
+      "properties": {
+        "maxSimultaneousWarnings": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "default": 1,
+          "description": "Maximum number of warning patterns that may render simultaneously. Always 1."
+        },
+        "maxSimultaneousRefusals": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "default": 1,
+          "description": "Maximum number of refusal patterns that may render simultaneously. Always 1."
+        },
+        "maxSimultaneousRecoveries": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "default": 1,
+          "description": "Maximum simultaneous recovery flows."
+        },
+        "illegalCombinations": {
+          "type": "array",
+          "description": "Pattern ID pairs that must never activate simultaneously.",
+          "items": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "stateTransitions": {
+      "type": "object",
+      "description": "Valid state machine transitions per category. Enforced by the state transition engine.",
+      "properties": {
+        "uncertainty": {
+          "$ref": "#/$defs/StateTransitionMap"
+        },
+        "refusal": {
+          "$ref": "#/$defs/StateTransitionMap"
+        },
+        "escalation": {
+          "$ref": "#/$defs/StateTransitionMap"
+        },
+        "recovery": {
+          "$ref": "#/$defs/StateTransitionMap"
+        }
+      }
+    },
+    "auditConfig": {
+      "type": "object",
+      "description": "Audit logging configuration for this engine instance.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "immutable": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, audit records cannot be modified after creation."
+        },
+        "requiredFields": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": ["eventId", "patternId", "primitiveSnapshot", "timestamp", "sessionId", "actor"]
+        },
+        "retentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Minimum number of days audit records are retained."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "RiskPrimitive": {
+      "type": "object",
+      "description": "P1 — Risk. Integer 0–4. Governs pattern severity and escalation triggers.",
+      "properties": {
+        "source": {"type": "string", "enum": ["static", "computed", "external"], "default": "computed"},
+        "defaultValue": {"type": "integer", "minimum": 0, "maximum": 4, "default": 1},
+        "levels": {
+          "type": "object",
+          "properties": {
+            "0": {"type": "string", "description": "No meaningful risk."},
+            "1": {"type": "string", "description": "Low — reversible, low-stakes."},
+            "2": {"type": "string", "description": "Moderate — recoverable, meaningful consequences."},
+            "3": {"type": "string", "description": "High — significant impact, potentially irreversible."},
+            "4": {"type": "string", "description": "Critical — safety, security, or compliance incident risk."}
+          }
+        }
+      }
+    },
+    "ConfidencePrimitive": {
+      "type": "object",
+      "description": "P2 — Confidence. The AI system's epistemic state about its output.",
+      "properties": {
+        "source": {"type": "string", "enum": ["model-score", "retrieval-score", "rule-based", "external"]},
+        "thresholds": {
+          "type": "object",
+          "description": "Score boundaries for each confidence state.",
+          "properties": {
+            "high": {"type": "number", "minimum": 0, "maximum": 1, "description": "Minimum score for High confidence."},
+            "moderate": {"type": "number", "minimum": 0, "maximum": 1, "description": "Minimum score for Moderate confidence."},
+            "low": {"type": "number", "minimum": 0, "maximum": 1, "description": "Minimum score for Low confidence (below = Insufficient)."}
+          }
+        },
+        "conflictingEvidenceDetection": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean", "default": true},
+            "minSources": {"type": "integer", "minimum": 2, "description": "Minimum number of contradictory sources required to activate conflicting-evidence-state."},
+            "sustainedWindowSeconds": {"type": "integer", "description": "For system-initiated monitoring: seconds of sustained conflict before CE state activates."}
+          }
+        },
+        "unresolvableWindowSeconds": {
+          "type": "integer",
+          "description": "Seconds a CE state must be sustained before transitioning to unresolvable-state. Safety-critical deployments should set this low (e.g., 30–240)."
+        }
+      }
+    },
+    "CapabilityPrimitive": {
+      "type": "object",
+      "description": "P3 — Capability. Whether the AI system can complete the requested action.",
+      "properties": {
+        "source": {"type": "string", "enum": ["rule-based", "model-evaluated"]},
+        "forbiddenActions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Action types the AI is never capable of executing in this deployment (hard capability limits)."
+        }
+      }
+    },
+    "PermissionPrimitive": {
+      "type": "object",
+      "description": "P4 — Permission. Whether the requesting user or system is authorized for the requested action.",
+      "properties": {
+        "source": {"type": "string", "enum": ["identity-provider", "role-map", "policy-engine"]},
+        "roleMap": {
+          "type": "object",
+          "description": "Maps role names to authority tiers (Tier 1 = standard; Tier 2 = power; Tier 3 = admin/override).",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          }
+        },
+        "passiveDismissalEqualsDenial": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, closing a permission request without explicit grant counts as a denial. Must be true for all consequential action types."
+        }
+      }
+    },
+    "PolicyPrimitive": {
+      "type": "object",
+      "description": "P5 — Policy. Whether a configured policy rule applies to the current interaction.",
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["tenant", "deployment"]},
+          "description": "Active policy levels for this deployment. Tenant-level takes precedence over deployment-level."
+        },
+        "rules": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/PolicyRule"}
+        }
+      }
+    },
+    "IntentPrimitive": {
+      "type": "object",
+      "description": "P6 — User Intent. The category of action the user is requesting.",
+      "properties": {
+        "source": {"type": "string", "enum": ["classifier", "explicit", "rule-based"]},
+        "validTypes": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["decision-support", "action-execution", "content-generation", "workflow-automation"]}
+        }
+      }
+    },
+    "BusinessImpactPrimitive": {
+      "type": "object",
+      "description": "P7 — Business Impact. Organizational consequence of the AI's action.",
+      "properties": {
+        "source": {"type": "string", "enum": ["static", "computed"]},
+        "defaultValue": {"type": "string", "enum": ["low", "medium", "high"]}
+      }
+    },
+    "AuthorityPrimitive": {
+      "type": "object",
+      "description": "P8 — User Authority. The user's authorization tier for consequential decisions.",
+      "properties": {
+        "source": {"type": "string", "enum": ["identity-provider", "role-map"]},
+        "tiers": {
+          "type": "object",
+          "properties": {
+            "1": {"type": "string", "description": "Standard user — no override authority."},
+            "2": {"type": "string", "description": "Power user / supervisor — can approve within defined limits."},
+            "3": {"type": "string", "description": "Admin / executive — can authorize policy exceptions."}
+          }
+        }
+      }
+    },
+    "ContextFreshnessPrimitive": {
+      "type": "object",
+      "description": "P9 — Context Freshness. Whether the AI's knowledge and data are current for this query.",
+      "properties": {
+        "source": {"type": "string", "enum": ["timestamp-comparison", "version-check", "external-signal"]},
+        "staleThresholdDays": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of days after which data is considered stale for this deployment context."
+        }
+      }
+    },
+    "SourceReliabilityPrimitive": {
+      "type": "object",
+      "description": "P10 — Source Reliability. Assessed credibility of the AI's information sources.",
+      "properties": {
+        "scale": {"type": "string", "enum": ["0-3"], "default": "0-3"},
+        "sourceTrustMap": {
+          "type": "object",
+          "description": "Maps source types to default reliability scores (0=none, 1=low, 2=medium, 3=high).",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          }
+        }
+      }
+    },
+    "SelectionRule": {
+      "type": "object",
+      "required": ["ruleId", "conditions", "activatePatterns"],
+      "properties": {
+        "ruleId": {"type": "string"},
+        "description": {"type": "string"},
+        "conditions": {
+          "type": "object",
+          "description": "Primitive values that must match for this rule to activate. All conditions are AND-logic.",
+          "properties": {
+            "P1Min": {"type": "integer", "minimum": 0, "maximum": 4},
+            "P1Max": {"type": "integer", "minimum": 0, "maximum": 4},
+            "P2": {"type": "array", "items": {"type": "string"}},
+            "P3": {"type": "string"},
+            "P4": {"type": "string"},
+            "P5": {"type": "string"},
+            "P6": {"type": "array", "items": {"type": "string"}},
+            "P7": {"type": "string"},
+            "P8Min": {"type": "integer", "minimum": 1, "maximum": 3},
+            "P9": {"type": "string"},
+            "P10Min": {"type": "integer", "minimum": 0, "maximum": 3}
+          }
+        },
+        "activatePatterns": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Pattern IDs to activate when conditions match."
+        },
+        "skipPatterns": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Pattern IDs explicitly suppressed by this rule."
+        }
+      }
+    },
+    "PolicyRule": {
+      "type": "object",
+      "required": ["ruleId", "level", "conditions", "effect"],
+      "properties": {
+        "ruleId": {"type": "string"},
+        "level": {"type": "string", "enum": ["tenant", "deployment"]},
+        "description": {"type": "string"},
+        "conditions": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "effect": {
+          "type": "string",
+          "enum": ["block", "require-permission", "require-escalation", "allow", "audit-only"]
+        },
+        "activatePattern": {"type": "string"}
+      }
+    },
+    "StateTransitionMap": {
+      "type": "object",
+      "description": "State machine transitions. Keys are source states; values are arrays of valid target states.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": "string"}
+      }
+    }
+  }
+}
