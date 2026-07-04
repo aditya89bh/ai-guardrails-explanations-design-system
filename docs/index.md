@@ -63,12 +63,17 @@ Domain-specific guidance for industries where AI pattern behavior is shaped by c
 - Critical infrastructure
 
 ### [Case Studies](case-studies/index.md)
-Reference implementations across common enterprise AI product types. Annotated walkthroughs of how patterns are applied in real product contexts.
+End-to-end reference implementations validating how the Guardrail Decision Engine, Pattern Library, and Component Library operate together in realistic enterprise AI deployments. Each case study traces a complete interaction from primitive evaluation through pattern selection, component rendering, user journey, audit trail, and recovery.
 
-- Chat assistant products
-- Autonomous agent systems
-- Decision-support tools
-- Content generation systems
+- Healthcare AI — drug interaction check (LC state, constrained-completion, role-escalation)
+- Banking fraud detection — real-time block (policy-refusal, emergency-escalation, redirect-recovery)
+- Insurance claims — missing documentation (II state, clarification-request, repair-recovery)
+- Enterprise HR — PIP generation (SC state, scoped-permission, delegated-permission)
+- Customer support — escalating complaint (progressive-warning, human-handoff, retry-recovery)
+- Developer copilot — conflicting CVE advisory (CE state, safe-refusal, alternative-suggestion)
+- Industrial AI — unresolvable sensor conflict (UR state, emergency-escalation, abandon-recovery)
+- Autonomous procurement — spend ceiling (blocking-warning, role-escalation, manual-override)
+- Cross-industry comparison matrix
 
 ---
 
@@ -81,7 +86,10 @@ Reference implementations across common enterprise AI product types. Annotated w
 → [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md) → [`/components`](../components/README.md) → [`/components/component-matrix.md`](../components/component-matrix.md) → [`/components/implementation-guidelines.md`](../components/implementation-guidelines.md)
 
 ### I am a compliance or trust & safety lead
-→ [Enterprise Playbooks](enterprise-playbooks/index.md) → [Regulated Industries](regulated-industries/index.md)
+→ [Enterprise Playbooks](enterprise-playbooks/index.md) → [Regulated Industries](regulated-industries/index.md) → [Case Studies](case-studies/index.md)
+
+### I want to validate an implementation against reference behavior
+→ [Case Studies](case-studies/index.md) → [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md)
 
 ### I want to contribute a new pattern
 → [Taxonomy](taxonomy/index.md) → [Patterns](patterns/index.md) → [`CONTRIBUTING.md`](../CONTRIBUTING.md)
@@ -97,6 +105,6 @@ Reference implementations across common enterprise AI product types. Annotated w
 | Patterns | Phase 1–2 | ✅ Complete — 36 pattern specifications (stable) |
 | Decision Flows | Phase 1, 3 | ✅ Complete — decision engine (6 documents, stable) |
 | Component Library | Phase 4 | ✅ Complete — 47 documents across 7 categories (stable) |
-| Enterprise Playbooks | Phase 1, 5 | Scaffold → Full guidance in Phase 5 |
-| Regulated Industries | Phase 1, 6 | Scaffold → Domain specs in Phase 6 |
-| Case Studies | Phase 1, 7 | Scaffold → Full studies in Phase 7 |
+| Enterprise Playbooks | Phase 1 | Scaffold |
+| Regulated Industries | Phase 1 | Scaffold |
+| Case Studies | Phase 1, 5 | ✅ Complete — 8 case studies + comparison matrix (stable) |
