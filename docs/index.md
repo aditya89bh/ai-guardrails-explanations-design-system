@@ -78,7 +78,7 @@ Reference implementations across common enterprise AI product types. Annotated w
 → [Principles](principles/index.md) → [Taxonomy](taxonomy/index.md) → [Patterns](patterns/index.md)
 
 ### I am an engineer
-→ [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md) → [`/patterns`](../patterns/README.md) → [`/components`](../components/README.md) → [`/examples`](../examples/README.md)
+→ [Decision Flows](decision-flows/index.md) → [Patterns](patterns/index.md) → [`/components`](../components/README.md) → [`/components/component-matrix.md`](../components/component-matrix.md) → [`/components/implementation-guidelines.md`](../components/implementation-guidelines.md)
 
 ### I am a compliance or trust & safety lead
 → [Enterprise Playbooks](enterprise-playbooks/index.md) → [Regulated Industries](regulated-industries/index.md)
@@ -94,8 +94,9 @@ Reference implementations across common enterprise AI product types. Annotated w
 |---|---|---|
 | Principles | Phase 1 | Scaffold |
 | Taxonomy | Phase 1 | Scaffold |
-| Patterns | Phase 1–2 | Scaffold → Full specs in Phase 2 |
+| Patterns | Phase 1–2 | ✅ Complete — 36 pattern specifications (stable) |
 | Decision Flows | Phase 1, 3 | ✅ Complete — decision engine (6 documents, stable) |
+| Component Library | Phase 4 | ✅ Complete — 47 documents across 7 categories (stable) |
 | Enterprise Playbooks | Phase 1, 5 | Scaffold → Full guidance in Phase 5 |
 | Regulated Industries | Phase 1, 6 | Scaffold → Domain specs in Phase 6 |
 | Case Studies | Phase 1, 7 | Scaffold → Full studies in Phase 7 |
